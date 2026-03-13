@@ -3,52 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/yp_white"
+    android:background="?attr/android:colorBackground"
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/settings_margin_large"
-        android:gravity="center_vertical"
-        android:minHeight="@dimen/settings_item_min_height"
-        android:paddingHorizontal="@dimen/standard_padding"
-        android:paddingVertical="@dimen/settings_item_padding_vertical">
+        style="@style/ScreenHeader"
+        android:layout_marginBottom="@dimen/settings_margin_large">
 
         <ImageView
             android:id="@+id/settings_back_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_back"
-            app:tint="@color/yp_black" />
+            android:src="@drawable/ic_arrow_back_24"
+            app:tint="?attr/colorOnSurface" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:text="@string/settings_title"
-            android:textColor="@color/yp_black"
-            android:textSize="@dimen/text_size_large"
-            android:textStyle="bold"
-            android:layout_marginStart="@dimen/settings_margin_large"/>
+            style="@style/HeaderText"
+            android:text="@string/settings_title" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="@dimen/settings_item_min_height"
-        android:paddingHorizontal="@dimen/standard_padding"
-        android:paddingVertical="@dimen/settings_item_padding_vertical">
+    <LinearLayout style="@style/SettingsItem">
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/settings_dark_theme"
-            android:textColor="@color/yp_black"
-            android:textSize="@dimen/text_size_medium" />
+            style="@style/SettingsItemText"
+            android:text="@string/settings_dark_theme" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:layout_width="wrap_content"
@@ -57,71 +36,41 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="@dimen/settings_item_min_height"
-        android:paddingHorizontal="@dimen/standard_padding"
-        android:paddingVertical="@dimen/settings_item_padding_vertical">
+        android:id="@+id/settings_share_button"
+        style="@style/SettingsItem">
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/settings_share_app"
-            android:textColor="@color/yp_black"
-            android:textSize="@dimen/text_size_medium" />
+            style="@style/SettingsItemText"
+            android:text="@string/settings_share_app" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_share"
-            app:tint="@color/yp_text_gray" />
+            style="@style/SettingsItemIcon"
+            android:src="@drawable/ic_share_24" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="@dimen/settings_item_min_height"
-        android:paddingHorizontal="@dimen/standard_padding"
-        android:paddingVertical="@dimen/settings_item_padding_vertical">
+        android:id="@+id/settings_support_button"
+        style="@style/SettingsItem">
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/settings_contact_support"
-            android:textColor="@color/yp_black"
-            android:textSize="@dimen/text_size_medium" />
+            style="@style/SettingsItemText"
+            android:text="@string/settings_contact_support" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_support"
-            app:tint="@color/yp_text_gray" />
+            style="@style/SettingsItemIcon"
+            android:src="@drawable/ic_support_24" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="@dimen/settings_item_min_height"
-        android:paddingHorizontal="@dimen/standard_padding"
-        android:paddingVertical="@dimen/settings_item_padding_vertical">
+        android:id="@+id/settings_agreement_button"
+        style="@style/SettingsItem">
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/settings_user_agreement"
-            android:textColor="@color/yp_black"
-            android:textSize="@dimen/text_size_medium" />
+            style="@style/SettingsItemText"
+            android:text="@string/settings_user_agreement" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_forward"
-            app:tint="@color/yp_text_gray" />
+            style="@style/SettingsItemIcon"
+            android:src="@drawable/ic_arrow_forward_24" />
     </LinearLayout>
 </LinearLayout>

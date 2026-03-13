@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="mainScreenBackground" format="color" />
+    <attr name="searchFieldBackgroundColor" format="color" />
+    <attr name="searchFieldOnColor" format="color" />
+</resources>
