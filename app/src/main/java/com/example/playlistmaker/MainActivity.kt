@@ -20,7 +20,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(searchIntent)
         }
 
-
         val libraryButtonOnClickListener = object : View.OnClickListener {
             override fun onClick(v: View?) {
                 val libraryIntent = Intent(this@MainActivity, LibraryActivity::class.java)
