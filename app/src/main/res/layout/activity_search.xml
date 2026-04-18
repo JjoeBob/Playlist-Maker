@@ -40,6 +40,7 @@
             android:singleLine="true"
             android:textColor="@color/yp_black"
             android:textColorHint="?attr/searchFieldOnColor"
+            android:textCursorDrawable="@drawable/edit_text_cursor"
             app:drawableTint="?attr/searchFieldOnColor" />
 
         <ImageView
@@ -117,7 +118,6 @@
                 android:layout_marginTop="24dp"
                 android:backgroundTint="?attr/colorOnSurface"
                 android:fontFamily="@font/ys_display_medium"
-                android:textColor="?attr/android:colorBackground"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:minWidth="0dp"
@@ -126,6 +126,7 @@
                 android:paddingVertical="10dp"
                 android:text="@string/search_update_button"
                 android:textAllCaps="false"
+                android:textColor="?attr/android:colorBackground"
                 android:textSize="14sp"
                 app:cornerRadius="54dp" />
 
