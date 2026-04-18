@@ -16,10 +16,11 @@
         app:title="@string/settings_title" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/themeSwitcher"
         style="@style/SettingsItem"
+        android:text="@string/settings_dark_theme"
         app:thumbTint="@color/switch_thumb_selector"
-        app:trackTint="@color/switch_track_selector"
-        android:text="@string/settings_dark_theme" />
+        app:trackTint="@color/switch_track_selector" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/settings_share_button"

@@ -6,16 +6,20 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.ThemeUtils
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.R
+import com.example.playlistmaker.app.App
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
     lateinit var toolbar: Toolbar
     lateinit var shareButton: TextView
     lateinit var supportButton: TextView
     lateinit var agreementButton: TextView
+    lateinit var themeSwitcher: SwitchMaterial
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +35,13 @@ class SettingsActivity : AppCompatActivity() {
         shareButton = findViewById(R.id.settings_share_button)
         supportButton = findViewById(R.id.settings_support_button)
         agreementButton = findViewById(R.id.settings_agreement_button)
+        themeSwitcher = findViewById(R.id.themeSwitcher)
 
         setupToolBar()
         setupShareButton()
         setupSupportButton()
         setupAgreementButton()
+        setupThemeSwitcher()
     }
 
     private fun setupToolBar() {
@@ -71,6 +77,19 @@ class SettingsActivity : AppCompatActivity() {
             val url = Uri.parse(getString(R.string.agreement_link))
             val agreementIntent = Intent(Intent.ACTION_VIEW, url)
             startActivity(agreementIntent)
+        }
+    }
+
+    private fun setupThemeSwitcher() {
+        val myApp = applicationContext as App
+        themeSwitcher.isChecked = myApp.darkTheme
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            myApp.switchTheme(checked)
+
+            val sharedPrefs = getSharedPreferences(App.SETTINGS_PREFS, MODE_PRIVATE)
+            sharedPrefs.edit()
+                .putBoolean(App.DARK_THEME_KEY, checked)
+                .apply()
         }
     }
 }
