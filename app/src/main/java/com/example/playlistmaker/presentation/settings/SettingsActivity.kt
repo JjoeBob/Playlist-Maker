@@ -12,25 +12,39 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.R
 
 class SettingsActivity : AppCompatActivity() {
+    lateinit var toolbar: Toolbar
+    lateinit var shareButton: TextView
+    lateinit var supportButton: TextView
+    lateinit var agreementButton: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
-//        TODO: перенести настройку view в отдельные setup
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root)) { view, windowInsets ->
             val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             windowInsets
         }
 
-        val toolbar = findViewById<Toolbar>(R.id.settings_toolbar)
+        toolbar = findViewById(R.id.settings_toolbar)
+        shareButton = findViewById(R.id.settings_share_button)
+        supportButton = findViewById(R.id.settings_support_button)
+        agreementButton = findViewById(R.id.settings_agreement_button)
 
+        setupToolBar()
+        setupShareButton()
+        setupSupportButton()
+        setupAgreementButton()
+    }
+
+    private fun setupToolBar() {
         toolbar.setNavigationOnClickListener {
             finish()
         }
+    }
 
-        val shareButton = findViewById<TextView>(R.id.settings_share_button)
+    private fun setupShareButton() {
         shareButton.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
@@ -38,8 +52,9 @@ class SettingsActivity : AppCompatActivity() {
             }
             startActivity(shareIntent)
         }
+    }
 
-        val supportButton = findViewById<TextView>(R.id.settings_support_button)
+    private fun setupSupportButton() {
         supportButton.setOnClickListener {
             val supportIntent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
@@ -49,8 +64,9 @@ class SettingsActivity : AppCompatActivity() {
             }
             startActivity(supportIntent)
         }
+    }
 
-        val agreementButton = findViewById<TextView>(R.id.settings_agreement_button)
+    private fun setupAgreementButton() {
         agreementButton.setOnClickListener {
             val url = Uri.parse(getString(R.string.agreement_link))
             val agreementIntent = Intent(Intent.ACTION_VIEW, url)
