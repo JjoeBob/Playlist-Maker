@@ -1,14 +1,15 @@
-    package com.example.playlistmaker.network
+package com.example.playlistmaker.network
 
-    import com.google.gson.annotations.SerializedName
+import com.google.gson.annotations.SerializedName
 
-    data class SearchResponse(
-        val results: List<Track>
-    )
+data class SearchResponse(
+    val results: List<Track>
+)
 
-    data class Track(
-        val trackName: String,
-        val artistName: String,
-        @SerializedName("trackTimeMillis") val trackTime: Long,
-        @SerializedName("artworkUrl100") val artworkUrl: String?
-    )
+data class Track(
+    val trackId: Int,
+    val trackName: String,
+    val artistName: String,
+    @SerializedName("trackTimeMillis") val trackTime: Long,
+    @SerializedName("artworkUrl100") val artworkUrl: String?
+)
