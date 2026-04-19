@@ -9,12 +9,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
+import com.example.playlistmaker.data.SearchHistory
 import com.example.playlistmaker.network.Track
 import com.example.playlistmaker.utils.dpToPx
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class TrackAdapter(private var trackList: List<Track>) :
+class TrackAdapter(
+    private var trackList: List<Track>,
+    private val onClickTrack: (Track) -> Unit
+) :
     RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -29,7 +33,7 @@ class TrackAdapter(private var trackList: List<Track>) :
         holder: TrackViewHolder,
         position: Int
     ) {
-        holder.bind(trackList[position])
+        holder.bind(trackList[position], onClickTrack)
     }
 
     override fun getItemCount(): Int {
@@ -50,7 +54,7 @@ class TrackAdapter(private var trackList: List<Track>) :
         val trackArtist = itemView.findViewById<TextView>(R.id.track_artist)
         val trackImage = itemView.findViewById<ImageView>(R.id.track_image)
         val trackDuration = itemView.findViewById<TextView>(R.id.track_duration)
-        fun bind(track: Track) {
+        fun bind(track: Track, onClickTrack: (Track) -> Unit) {
             trackTitle.text = track.trackName
             trackArtist.text = track.artistName
             trackDuration.text = timeFormatter.format(track.trackTime)
@@ -60,6 +64,10 @@ class TrackAdapter(private var trackList: List<Track>) :
                 .transform(RoundedCorners(2f.dpToPx(itemView.context)))
                 .placeholder(R.drawable.ic_placeholder_track_45)
                 .into(trackImage)
+
+            itemView.setOnClickListener {
+                onClickTrack(track)
+            }
         }
     }
 }

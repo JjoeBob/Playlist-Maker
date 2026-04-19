@@ -3,6 +3,7 @@ package com.example.playlistmaker.presentation.search
 import ItunesNetworkClient
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -19,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
+import com.example.playlistmaker.data.SearchHistory
 import com.example.playlistmaker.network.SearchResponse
 import retrofit2.Call
 import retrofit2.Callback
@@ -35,10 +37,15 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchField: EditText
     private lateinit var clearButton: ImageView
     private lateinit var tracksRecyclerView: RecyclerView
+    private lateinit var searchHistoryRecyclerView: RecyclerView
     private lateinit var placeholderNothingFound: LinearLayout
     private lateinit var placeholderNoInternet: LinearLayout
+    private lateinit var searchHistoryLinear: LinearLayout
     private lateinit var searchUpdateButton: Button
-    private val adapter = TrackAdapter(emptyList())
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var clearHistoryButton: Button
+    private lateinit var searchAdapter: TrackAdapter
+    private lateinit var historyAdapter: TrackAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,15 +62,22 @@ class SearchActivity : AppCompatActivity() {
         searchField = findViewById(R.id.search_field)
         clearButton = findViewById(R.id.search_field_clear)
         tracksRecyclerView = findViewById(R.id.search_recycler_view)
+        searchHistoryRecyclerView = findViewById(R.id.search_history_recycler_view)
         placeholderNothingFound = findViewById(R.id.placeholder_nothing_found)
         placeholderNoInternet = findViewById(R.id.placeholder_no_internet)
+        searchHistoryLinear = findViewById(R.id.search_history)
         searchUpdateButton = findViewById(R.id.search_update_button)
+        clearHistoryButton = findViewById(R.id.clear_search_history)
+        searchHistory = SearchHistory(this)
 
+        setupAdapters()
         setupToolBar()
         setupSearch()
         setupClear()
         setupTracksRecycler()
+        setupHistoryRecycler()
         setupSearchUpdateButton()
+        setupClearHistoryButton()
     }
 
     private fun setupToolBar() {
@@ -72,7 +86,23 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateHistoryVisibility() {
+        val hasFocus = searchField.hasFocus()
+        val isTextEmpty = searchField.text.isEmpty()
+        val isHistoryNotEmpty = searchHistory.getHistory().isNotEmpty()
+
+        if (hasFocus && isTextEmpty && isHistoryNotEmpty) {
+            displaySearchState(SearchState.HISTORY)
+        } else if (isTextEmpty) {
+            displaySearchState(SearchState.CLEAR)
+        }
+    }
+
     private fun setupSearch() {
+        val searchOnFocusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
+            updateHistoryVisibility()
+        }
+
         val searchTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
@@ -83,8 +113,10 @@ class SearchActivity : AppCompatActivity() {
                 searchText = s.toString()
 
                 if (s.isNullOrEmpty()) {
-                    adapter.updateTracks(emptyList())
-                    displaySearchResult(SearchState.CLEAR)
+                    searchAdapter.updateTracks(emptyList())
+                    updateHistoryVisibility()
+                } else {
+                    displaySearchState(SearchState.CLEAR)
                 }
             }
 
@@ -93,6 +125,7 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
+        searchField.onFocusChangeListener = searchOnFocusChangeListener
         searchField.addTextChangedListener(searchTextWatcher)
 
         searchField.setOnEditorActionListener { _, actionId, _ ->
@@ -108,14 +141,33 @@ class SearchActivity : AppCompatActivity() {
             searchField.text.clear()
             val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(searchField.windowToken, 0)
-            searchField.clearFocus()
-            adapter.updateTracks(emptyList())
-            displaySearchResult(SearchState.CLEAR)
+            searchAdapter.updateTracks(emptyList())
+            updateHistoryVisibility()
         }
     }
 
+    private fun setupAdapters() {
+        searchAdapter = TrackAdapter(emptyList()) { track ->
+            searchHistory.addTrack(track)
+            historyAdapter.updateTracks(searchHistory.getHistory())
+        }
+        historyAdapter = TrackAdapter(searchHistory.getHistory()) { }
+    }
+
     private fun setupTracksRecycler() {
-        tracksRecyclerView.adapter = adapter
+        tracksRecyclerView.adapter = searchAdapter
+    }
+
+    private fun setupHistoryRecycler() {
+        searchHistoryRecyclerView.adapter = historyAdapter
+    }
+
+    private fun setupClearHistoryButton() {
+        clearHistoryButton.setOnClickListener {
+            searchHistory.clearHistory()
+            historyAdapter.updateTracks(emptyList())
+            displaySearchState(SearchState.CLEAR)
+        }
     }
 
     private fun setupSearchUpdateButton() {
@@ -126,8 +178,8 @@ class SearchActivity : AppCompatActivity() {
 
     private fun search() {
         if (searchText.isNotEmpty()) {
-            adapter.updateTracks(emptyList())
-            displaySearchResult(SearchState.CLEAR)
+            searchAdapter.updateTracks(emptyList())
+            displaySearchState(SearchState.CLEAR)
             ItunesNetworkClient.itunesApi.search(searchText)
                 .enqueue(object : Callback<SearchResponse> {
                     override fun onResponse(
@@ -137,13 +189,13 @@ class SearchActivity : AppCompatActivity() {
                         if (response.code() == 200) {
                             val results = response.body()?.results
                             if (results?.isNotEmpty() == true) {
-                                adapter.updateTracks(results)
-                                displaySearchResult(SearchState.SUCCESS)
+                                searchAdapter.updateTracks(results)
+                                displaySearchState(SearchState.SUCCESS)
                             } else {
-                                displaySearchResult(SearchState.EMPTY)
+                                displaySearchState(SearchState.EMPTY)
                             }
                         } else {
-                            displaySearchResult(SearchState.ERROR)
+                            displaySearchState(SearchState.ERROR)
                         }
                     }
 
@@ -151,7 +203,7 @@ class SearchActivity : AppCompatActivity() {
                         call: Call<SearchResponse>,
                         t: Throwable
                     ) {
-                        displaySearchResult(SearchState.ERROR)
+                        displaySearchState(SearchState.ERROR)
                     }
 
                 })
@@ -159,34 +211,25 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private enum class SearchState {
-        SUCCESS, EMPTY, ERROR, CLEAR
+        SUCCESS, EMPTY, ERROR, CLEAR, HISTORY
     }
 
-    private fun displaySearchResult(state: SearchState) {
+    private fun displaySearchState(state: SearchState) {
+        placeholderNothingFound.visibility = View.GONE
+        placeholderNoInternet.visibility = View.GONE
+        tracksRecyclerView.visibility = View.GONE
+        searchHistoryLinear.visibility = View.GONE
+
         when (state) {
-            SearchState.SUCCESS -> {
-                placeholderNothingFound.visibility = View.GONE
-                placeholderNoInternet.visibility = View.GONE
-                tracksRecyclerView.visibility = View.VISIBLE
+            SearchState.SUCCESS -> tracksRecyclerView.visibility = View.VISIBLE
+            SearchState.EMPTY -> placeholderNothingFound.visibility = View.VISIBLE
+            SearchState.ERROR -> placeholderNoInternet.visibility = View.VISIBLE
+            SearchState.HISTORY -> {
+                historyAdapter.updateTracks(searchHistory.getHistory())
+                searchHistoryLinear.visibility = View.VISIBLE
             }
 
-            SearchState.EMPTY -> {
-                placeholderNothingFound.visibility = View.VISIBLE
-                placeholderNoInternet.visibility = View.GONE
-                tracksRecyclerView.visibility = View.GONE
-            }
-
-            SearchState.ERROR -> {
-                placeholderNothingFound.visibility = View.GONE
-                placeholderNoInternet.visibility = View.VISIBLE
-                tracksRecyclerView.visibility = View.GONE
-            }
-
-            SearchState.CLEAR -> {
-                placeholderNothingFound.visibility = View.GONE
-                placeholderNoInternet.visibility = View.GONE
-                tracksRecyclerView.visibility = View.GONE
-            }
+            SearchState.CLEAR -> {}
         }
     }
 
