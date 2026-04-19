@@ -107,7 +107,7 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="24dp"
-            app:iconTint="?attr/colorOnSurface"
+            app:iconTint="@color/yp_white"
             app:layout_constraintBottom_toBottomOf="@id/playButton"
             app:layout_constraintEnd_toStartOf="@id/playButton"
             app:layout_constraintHorizontal_chainStyle="packed"
@@ -143,7 +143,7 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="24dp"
-            app:iconTint="?attr/colorOnSurface"
+            app:iconTint="@color/yp_white"
             app:layout_constraintBottom_toBottomOf="@id/playButton"
             app:layout_constraintEnd_toEndOf="@id/endGuideLine24"
             app:layout_constraintStart_toEndOf="@id/playButton"
@@ -156,12 +156,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:fontFamily="@font/ys_display_medium"
+            android:text="00:00"
             android:textColor="?attr/colorOnSurface"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="@id/endGuideLine24"
             app:layout_constraintStart_toStartOf="@id/startGuideLine24"
-            app:layout_constraintTop_toBottomOf="@id/playButton"
-            tools:text="0:30" />
+            app:layout_constraintTop_toBottomOf="@id/playButton" />
 
 
         <TextView
