@@ -36,6 +36,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private var searchText = ""
+    private var searchCall: Call<SearchResponse>? = null
 
     private lateinit var toolbar: Toolbar
     private lateinit var searchField: EditText
@@ -90,6 +91,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(searchRunnable)
+        searchCall?.cancel()
     }
 
     private fun setupToolBar() {
@@ -208,33 +210,33 @@ class SearchActivity : AppCompatActivity() {
         if (searchText.isNotEmpty()) {
             searchAdapter.updateTracks(emptyList())
             displaySearchState(SearchState.CLEAR)
-            ItunesNetworkClient.itunesApi.search(searchText)
-                .enqueue(object : Callback<SearchResponse> {
-                    override fun onResponse(
-                        call: Call<SearchResponse>,
-                        response: Response<SearchResponse>
-                    ) {
-                        if (response.code() == 200) {
-                            val results = response.body()?.results
-                            if (results?.isNotEmpty() == true) {
-                                searchAdapter.updateTracks(results)
-                                displaySearchState(SearchState.SUCCESS)
-                            } else {
-                                displaySearchState(SearchState.EMPTY)
-                            }
+            searchCall = ItunesNetworkClient.itunesApi.search(searchText)
+            searchCall?.enqueue(object : Callback<SearchResponse> {
+                override fun onResponse(
+                    call: Call<SearchResponse>,
+                    response: Response<SearchResponse>
+                ) {
+                    if (response.code() == 200) {
+                        val results = response.body()?.results
+                        if (results?.isNotEmpty() == true) {
+                            searchAdapter.updateTracks(results)
+                            displaySearchState(SearchState.SUCCESS)
                         } else {
-                            displaySearchState(SearchState.ERROR)
+                            displaySearchState(SearchState.EMPTY)
                         }
-                    }
-
-                    override fun onFailure(
-                        call: Call<SearchResponse>,
-                        t: Throwable
-                    ) {
+                    } else {
                         displaySearchState(SearchState.ERROR)
                     }
+                }
 
-                })
+                override fun onFailure(
+                    call: Call<SearchResponse>,
+                    t: Throwable
+                ) {
+                    displaySearchState(SearchState.ERROR)
+                }
+
+            })
         }
     }
 
