@@ -3,6 +3,8 @@ package com.example.playlistmaker.presentation.search
 import ItunesNetworkClient
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -30,9 +32,10 @@ import retrofit2.Response
 class SearchActivity : AppCompatActivity() {
     companion object {
         private const val SEARCH_TEXT_KEY = "SEARCH_TEXT"
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 
-    private var searchText: String = ""
+    private var searchText = ""
 
     private lateinit var toolbar: Toolbar
     private lateinit var searchField: EditText
@@ -47,6 +50,9 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var clearHistoryButton: Button
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { search() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +85,11 @@ class SearchActivity : AppCompatActivity() {
         setupHistoryRecycler()
         setupSearchUpdateButton()
         setupClearHistoryButton()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(searchRunnable)
     }
 
     private fun setupToolBar() {
@@ -119,6 +130,8 @@ class SearchActivity : AppCompatActivity() {
                 } else {
                     displaySearchState(SearchState.CLEAR)
                 }
+
+                searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -134,6 +147,13 @@ class SearchActivity : AppCompatActivity() {
                 search()
             }
             false
+        }
+    }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        if (searchText.isNotEmpty()) {
+            handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
         }
     }
 
