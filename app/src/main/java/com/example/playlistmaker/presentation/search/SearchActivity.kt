@@ -1,9 +1,9 @@
 package com.example.playlistmaker.presentation.search
 
 import ItunesNetworkClient
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
-import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.data.SearchHistory
 import com.example.playlistmaker.network.SearchResponse
+import com.example.playlistmaker.presentation.player.PlayerActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -99,7 +100,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupSearch() {
-        val searchOnFocusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
+        val searchOnFocusChangeListener = View.OnFocusChangeListener { _, _ ->
             updateHistoryVisibility()
         }
 
@@ -150,8 +151,15 @@ class SearchActivity : AppCompatActivity() {
         searchAdapter = TrackAdapter(emptyList()) { track ->
             searchHistory.addTrack(track)
             historyAdapter.updateTracks(searchHistory.getHistory())
+            val playerIntent = Intent(this, PlayerActivity::class.java)
+            playerIntent.putExtra("track", track)
+            startActivity(playerIntent)
         }
-        historyAdapter = TrackAdapter(searchHistory.getHistory()) { }
+        historyAdapter = TrackAdapter(searchHistory.getHistory()) { track ->
+            val playerIntent = Intent(this, PlayerActivity::class.java)
+            playerIntent.putExtra("track", track)
+            startActivity(playerIntent)
+        }
     }
 
     private fun setupTracksRecycler() {

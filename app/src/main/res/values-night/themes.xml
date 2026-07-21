@@ -7,6 +7,7 @@
         <item name="colorOnSurfaceVariant">@color/yp_white</item>
         <item name="searchFieldBackgroundColor">@color/yp_white</item>
         <item name="searchFieldOnColor">@color/yp_black</item>
+        <item name="playerSmallButton">@color/yp_white_25</item>
     </style>
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />

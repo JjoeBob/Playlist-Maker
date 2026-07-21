@@ -3,4 +3,5 @@
     <attr name="mainScreenBackground" format="color" />
     <attr name="searchFieldBackgroundColor" format="color" />
     <attr name="searchFieldOnColor" format="color" />
+    <attr name="playerSmallButton" format="color" />
 </resources>
