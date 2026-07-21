@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -51,6 +52,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var clearHistoryButton: Button
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
+    private lateinit var progressBar: ProgressBar
 
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { search() }
@@ -76,6 +78,7 @@ class SearchActivity : AppCompatActivity() {
         searchHistoryLinear = findViewById(R.id.search_history)
         searchUpdateButton = findViewById(R.id.search_update_button)
         clearHistoryButton = findViewById(R.id.clear_search_history)
+        progressBar = findViewById(R.id.progress_bar)
         searchHistory = SearchHistory(this)
 
         setupAdapters()
@@ -209,7 +212,7 @@ class SearchActivity : AppCompatActivity() {
     private fun search() {
         if (searchText.isNotEmpty()) {
             searchAdapter.updateTracks(emptyList())
-            displaySearchState(SearchState.CLEAR)
+            displaySearchState(SearchState.IN_PROGRESS)
             searchCall = ItunesNetworkClient.itunesApi.search(searchText)
             searchCall?.enqueue(object : Callback<SearchResponse> {
                 override fun onResponse(
@@ -241,7 +244,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private enum class SearchState {
-        SUCCESS, EMPTY, ERROR, CLEAR, HISTORY
+        SUCCESS, EMPTY, ERROR, CLEAR, HISTORY, IN_PROGRESS
     }
 
     private fun displaySearchState(state: SearchState) {
@@ -249,6 +252,7 @@ class SearchActivity : AppCompatActivity() {
         placeholderNoInternet.visibility = View.GONE
         tracksRecyclerView.visibility = View.GONE
         searchHistoryLinear.visibility = View.GONE
+        progressBar.visibility = View.GONE
 
         when (state) {
             SearchState.SUCCESS -> tracksRecyclerView.visibility = View.VISIBLE
@@ -259,6 +263,7 @@ class SearchActivity : AppCompatActivity() {
                 searchHistoryLinear.visibility = View.VISIBLE
             }
 
+            SearchState.IN_PROGRESS -> progressBar.visibility = View.VISIBLE
             SearchState.CLEAR -> {}
         }
     }
