@@ -34,10 +34,14 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         private const val SEARCH_TEXT_KEY = "SEARCH_TEXT"
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
     private var searchText = ""
     private var searchCall: Call<SearchResponse>? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { search() }
+    private var isClickAllowed = true
 
     private lateinit var toolbar: Toolbar
     private lateinit var searchField: EditText
@@ -53,9 +57,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
     private lateinit var progressBar: ProgressBar
-
-    private val handler = Handler(Looper.getMainLooper())
-    private val searchRunnable = Runnable { search() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,13 +131,14 @@ class SearchActivity : AppCompatActivity() {
                 searchText = s.toString()
 
                 if (s.isNullOrEmpty()) {
+                    handler.removeCallbacks(searchRunnable)
+                    searchCall?.cancel()
+
                     searchAdapter.updateTracks(emptyList())
                     updateHistoryVisibility()
                 } else {
-                    displaySearchState(SearchState.CLEAR)
+                    searchDebounce()
                 }
-
-                searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -172,18 +174,31 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
     private fun setupAdapters() {
         searchAdapter = TrackAdapter(emptyList()) { track ->
-            searchHistory.addTrack(track)
-            historyAdapter.updateTracks(searchHistory.getHistory())
-            val playerIntent = Intent(this, PlayerActivity::class.java)
-            playerIntent.putExtra("track", track)
-            startActivity(playerIntent)
+            if (clickDebounce()) {
+                searchHistory.addTrack(track)
+                historyAdapter.updateTracks(searchHistory.getHistory())
+                val playerIntent = Intent(this, PlayerActivity::class.java)
+                playerIntent.putExtra("track", track)
+                startActivity(playerIntent)
+            }
         }
         historyAdapter = TrackAdapter(searchHistory.getHistory()) { track ->
-            val playerIntent = Intent(this, PlayerActivity::class.java)
-            playerIntent.putExtra("track", track)
-            startActivity(playerIntent)
+            if (clickDebounce()) {
+                val playerIntent = Intent(this, PlayerActivity::class.java)
+                playerIntent.putExtra("track", track)
+                startActivity(playerIntent)
+            }
         }
     }
 
@@ -211,6 +226,9 @@ class SearchActivity : AppCompatActivity() {
 
     private fun search() {
         if (searchText.isNotEmpty()) {
+            handler.removeCallbacks(searchRunnable)
+            searchCall?.cancel()
+
             searchAdapter.updateTracks(emptyList())
             displaySearchState(SearchState.IN_PROGRESS)
             searchCall = ItunesNetworkClient.itunesApi.search(searchText)
