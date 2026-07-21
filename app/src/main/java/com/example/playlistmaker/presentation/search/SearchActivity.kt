@@ -42,6 +42,7 @@ class SearchActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { search() }
     private var isClickAllowed = true
+    private val clickRunnable = Runnable { isClickAllowed = true }
 
     private lateinit var toolbar: Toolbar
     private lateinit var searchField: EditText
@@ -95,6 +96,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(searchRunnable)
+        handler.removeCallbacks(clickRunnable)
         searchCall?.cancel()
     }
 
@@ -178,7 +180,7 @@ class SearchActivity : AppCompatActivity() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            handler.postDelayed(clickRunnable, CLICK_DEBOUNCE_DELAY)
         }
         return current
     }
