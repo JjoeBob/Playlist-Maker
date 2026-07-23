@@ -24,7 +24,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.data.SearchHistory
-import com.example.playlistmaker.network.SearchResponse
+import com.example.playlistmaker.data.dto.TracksSearchResponse
 import com.example.playlistmaker.presentation.player.PlayerActivity
 import retrofit2.Call
 import retrofit2.Callback
@@ -38,7 +38,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private var searchText = ""
-    private var searchCall: Call<SearchResponse>? = null
+    private var searchCall: Call<TracksSearchResponse>? = null
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { search() }
     private var isClickAllowed = true
@@ -234,10 +234,10 @@ class SearchActivity : AppCompatActivity() {
             searchAdapter.updateTracks(emptyList())
             displaySearchState(SearchState.IN_PROGRESS)
             searchCall = ItunesNetworkClient.itunesApi.search(searchText)
-            searchCall?.enqueue(object : Callback<SearchResponse> {
+            searchCall?.enqueue(object : Callback<TracksSearchResponse> {
                 override fun onResponse(
-                    call: Call<SearchResponse>,
-                    response: Response<SearchResponse>
+                    call: Call<TracksSearchResponse>,
+                    response: Response<TracksSearchResponse>
                 ) {
                     if (response.code() == 200) {
                         val results = response.body()?.results
@@ -253,7 +253,7 @@ class SearchActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(
-                    call: Call<SearchResponse>,
+                    call: Call<TracksSearchResponse>,
                     t: Throwable
                 ) {
                     displaySearchState(SearchState.ERROR)

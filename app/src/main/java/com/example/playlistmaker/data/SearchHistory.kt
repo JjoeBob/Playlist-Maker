@@ -2,7 +2,7 @@ package com.example.playlistmaker.data
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
-import com.example.playlistmaker.network.Track
+import com.example.playlistmaker.data.network.Track
 import com.google.gson.Gson
 
 class SearchHistory(private val context: Context) {

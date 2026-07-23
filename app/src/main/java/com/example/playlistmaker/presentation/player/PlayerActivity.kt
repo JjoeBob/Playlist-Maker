@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
-import com.example.playlistmaker.network.Track
+import com.example.playlistmaker.data.network.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 

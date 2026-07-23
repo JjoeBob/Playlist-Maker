@@ -1,11 +1,7 @@
-package com.example.playlistmaker.network
+package com.example.playlistmaker.domain.models
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
-
-data class SearchResponse(
-    val results: List<Track>
-)
 
 data class Track(
     val trackId: Long,
