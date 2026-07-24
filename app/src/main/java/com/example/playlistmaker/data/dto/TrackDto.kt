@@ -14,8 +14,4 @@ data class TrackDto(
     val primaryGenreName: String?,
     val country: String?,
     val previewUrl: String?
-) : Serializable {
-    fun getCoverArtwork(): String? {
-        return artworkUrl?.replaceAfterLast('/', "512x512bb.jpg")
-    }
-}
+)
