@@ -28,4 +28,5 @@
     <string name="player_year">Год</string>
     <string name="player_genre">Жанр</string>
     <string name="player_country">Страна</string>
+    <string name="default_timer_value">0:00</string>
 </resources>

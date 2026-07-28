@@ -1,6 +1,9 @@
 package com.example.playlistmaker.presentation.player
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -16,6 +19,15 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
+
+        private const val UPDATE_TIME_DELAY = 100L
+    }
+
     private lateinit var toolbar: Toolbar
     private lateinit var albumImage: ImageView
     private lateinit var trackTitle: TextView
@@ -27,6 +39,21 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var releaseDateValue: TextView
     private lateinit var genre: TextView
     private lateinit var country: TextView
+    private lateinit var playButton: ImageView
+    private lateinit var playbackTime: TextView
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    private var mediaPlayer = MediaPlayer()
+    private var playerState = STATE_DEFAULT
+    private val timeFormatter = SimpleDateFormat("m:ss", Locale.getDefault())
+
+    private val timerRunnable = object : Runnable {
+        override fun run() {
+            playbackTime.text = timeFormatter.format(mediaPlayer.currentPosition)
+            handler.postDelayed(this, UPDATE_TIME_DELAY)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,11 +76,80 @@ class PlayerActivity : AppCompatActivity() {
         releaseDateValue = findViewById(R.id.yearValue)
         genre = findViewById(R.id.genreValue)
         country = findViewById(R.id.countryValue)
+        playButton = findViewById(R.id.playButton)
+        playbackTime = findViewById(R.id.playbackTime)
 
         val track = intent.getSerializableExtra("track") as? Track ?: return
 
+        setupPlayButton()
+        preparePlayer(track)
         setupToolBar()
         bindTrackData(track)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+        handler.removeCallbacks(timerRunnable)
+    }
+
+    private fun preparePlayer(track: Track) {
+        val url = track.previewUrl
+
+        if (!url.isNullOrEmpty()) {
+            mediaPlayer.setDataSource(url)
+            mediaPlayer.prepareAsync()
+            mediaPlayer.setOnPreparedListener {
+                playButton.isEnabled = true
+                playerState = STATE_PREPARED
+            }
+            mediaPlayer.setOnCompletionListener {
+                playButton.setImageResource(R.drawable.ic_player_play)
+                playerState = STATE_PREPARED
+                handler.removeCallbacks(timerRunnable)
+                playbackTime.text = getString(R.string.default_timer_value)
+            }
+        } else {
+            playButton.isEnabled = false
+        }
+    }
+
+    private fun setupPlayButton() {
+        playButton.isEnabled = false
+        playButton.setOnClickListener {
+            playbackControl()
+        }
+    }
+
+    private fun startPlayer() {
+        mediaPlayer.start()
+        playButton.setImageResource(R.drawable.ic_player_pause)
+        playerState = STATE_PLAYING
+        handler.post(timerRunnable)
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        playButton.setImageResource(R.drawable.ic_player_play)
+        playerState = STATE_PAUSED
+        handler.removeCallbacks(timerRunnable)
+    }
+
+    private fun playbackControl() {
+        when (playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+            }
+
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+            }
+        }
     }
 
     private fun setupToolBar() {
