@@ -1,20 +1,22 @@
 package com.example.playlistmaker.presentation.settings
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.ThemeUtils
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
 import com.example.playlistmaker.app.App
+import com.example.playlistmaker.domain.models.ThemeSettings
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
+    private val settingsInteractor by lazy { Creator.provideSettingsInteractor(this) }
+    private val sharingInteractor by lazy { Creator.provideSharingInteractor(this) }
+
     lateinit var toolbar: Toolbar
     lateinit var shareButton: TextView
     lateinit var supportButton: TextView
@@ -52,44 +54,28 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupShareButton() {
         shareButton.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, getString(R.string.share_link))
-            }
-            startActivity(shareIntent)
+            sharingInteractor.share()
         }
     }
 
     private fun setupSupportButton() {
         supportButton.setOnClickListener {
-            val supportIntent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:")
-                putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
-                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject))
-                putExtra(Intent.EXTRA_TEXT, getString(R.string.support_message))
-            }
-            startActivity(supportIntent)
+            sharingInteractor.openSupport()
         }
     }
 
     private fun setupAgreementButton() {
         agreementButton.setOnClickListener {
-            val url = Uri.parse(getString(R.string.agreement_link))
-            val agreementIntent = Intent(Intent.ACTION_VIEW, url)
-            startActivity(agreementIntent)
+            sharingInteractor.openAgreement()
         }
     }
 
     private fun setupThemeSwitcher() {
-        val myApp = applicationContext as App
-        themeSwitcher.isChecked = myApp.darkTheme
-        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
-            myApp.switchTheme(checked)
+        themeSwitcher.isChecked = settingsInteractor.getThemeSettings().isDarkTheme
+        themeSwitcher.setOnCheckedChangeListener { _, checked ->
+            (applicationContext as App).switchTheme(checked)
 
-            val sharedPrefs = getSharedPreferences(App.SETTINGS_PREFS, MODE_PRIVATE)
-            sharedPrefs.edit()
-                .putBoolean(App.DARK_THEME_KEY, checked)
-                .apply()
+            settingsInteractor.updateThemeSettings(ThemeSettings(checked))
         }
     }
 }

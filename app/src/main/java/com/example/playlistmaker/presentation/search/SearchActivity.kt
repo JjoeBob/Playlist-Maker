@@ -1,6 +1,5 @@
 package com.example.playlistmaker.presentation.search
 
-import ItunesNetworkClient
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -22,13 +21,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
-import com.example.playlistmaker.data.SearchHistory
-import com.example.playlistmaker.data.dto.TracksSearchResponse
+import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.player.PlayerActivity
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SearchActivity : AppCompatActivity() {
     companion object {
@@ -38,7 +34,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private var searchText = ""
-    private var searchCall: Call<TracksSearchResponse>? = null
+    private val tracksInteractor = Creator.provideTracksInteractor()
+    private val searchHistoryInteractor by lazy { Creator.provideSearchHistoryInteractor(this) }
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { search() }
     private var isClickAllowed = true
@@ -53,7 +50,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderNoInternet: LinearLayout
     private lateinit var searchHistoryLinear: LinearLayout
     private lateinit var searchUpdateButton: Button
-    private lateinit var searchHistory: SearchHistory
     private lateinit var clearHistoryButton: Button
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
@@ -81,7 +77,6 @@ class SearchActivity : AppCompatActivity() {
         searchUpdateButton = findViewById(R.id.search_update_button)
         clearHistoryButton = findViewById(R.id.clear_search_history)
         progressBar = findViewById(R.id.progress_bar)
-        searchHistory = SearchHistory(this)
 
         setupAdapters()
         setupToolBar()
@@ -97,7 +92,7 @@ class SearchActivity : AppCompatActivity() {
         super.onDestroy()
         handler.removeCallbacks(searchRunnable)
         handler.removeCallbacks(clickRunnable)
-        searchCall?.cancel()
+        tracksInteractor.cancelSearch()
     }
 
     private fun setupToolBar() {
@@ -109,7 +104,8 @@ class SearchActivity : AppCompatActivity() {
     private fun updateHistoryVisibility() {
         val hasFocus = searchField.hasFocus()
         val isTextEmpty = searchField.text.isEmpty()
-        val isHistoryNotEmpty = searchHistory.getHistory().isNotEmpty()
+        val isHistoryNotEmpty = searchHistoryInteractor.getHistory()
+            .isNotEmpty()
 
         if (hasFocus && isTextEmpty && isHistoryNotEmpty) {
             displaySearchState(SearchState.HISTORY)
@@ -134,9 +130,9 @@ class SearchActivity : AppCompatActivity() {
 
                 if (s.isNullOrEmpty()) {
                     handler.removeCallbacks(searchRunnable)
-                    searchCall?.cancel()
+                    tracksInteractor.cancelSearch()
 
-                    searchAdapter.updateTracks(emptyList())
+                    searchAdapter.updateTracks(emptyList<Track>())
                     updateHistoryVisibility()
                 } else {
                     searchDebounce()
@@ -171,7 +167,7 @@ class SearchActivity : AppCompatActivity() {
             searchField.text.clear()
             val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(searchField.windowToken, 0)
-            searchAdapter.updateTracks(emptyList())
+            searchAdapter.updateTracks(emptyList<Track>())
             updateHistoryVisibility()
         }
     }
@@ -186,16 +182,16 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupAdapters() {
-        searchAdapter = TrackAdapter(emptyList()) { track ->
+        searchAdapter = TrackAdapter(emptyList<Track>()) { track ->
             if (clickDebounce()) {
-                searchHistory.addTrack(track)
-                historyAdapter.updateTracks(searchHistory.getHistory())
+                searchHistoryInteractor.addTrack(track)
+                historyAdapter.updateTracks(searchHistoryInteractor.getHistory())
                 val playerIntent = Intent(this, PlayerActivity::class.java)
                 playerIntent.putExtra("track", track)
                 startActivity(playerIntent)
             }
         }
-        historyAdapter = TrackAdapter(searchHistory.getHistory()) { track ->
+        historyAdapter = TrackAdapter(searchHistoryInteractor.getHistory()) { track ->
             if (clickDebounce()) {
                 val playerIntent = Intent(this, PlayerActivity::class.java)
                 playerIntent.putExtra("track", track)
@@ -214,8 +210,8 @@ class SearchActivity : AppCompatActivity() {
 
     private fun setupClearHistoryButton() {
         clearHistoryButton.setOnClickListener {
-            searchHistory.clearHistory()
-            historyAdapter.updateTracks(emptyList())
+            searchHistoryInteractor.clearHistory()
+            historyAdapter.updateTracks(emptyList<Track>())
             displaySearchState(SearchState.CLEAR)
         }
     }
@@ -229,37 +225,22 @@ class SearchActivity : AppCompatActivity() {
     private fun search() {
         if (searchText.isNotEmpty()) {
             handler.removeCallbacks(searchRunnable)
-            searchCall?.cancel()
 
-            searchAdapter.updateTracks(emptyList())
+            searchAdapter.updateTracks(emptyList<Track>())
             displaySearchState(SearchState.IN_PROGRESS)
-            searchCall = ItunesNetworkClient.itunesApi.search(searchText)
-            searchCall?.enqueue(object : Callback<TracksSearchResponse> {
-                override fun onResponse(
-                    call: Call<TracksSearchResponse>,
-                    response: Response<TracksSearchResponse>
-                ) {
-                    if (response.code() == 200) {
-                        val results = response.body()?.results
-                        if (results?.isNotEmpty() == true) {
-                            searchAdapter.updateTracks(results)
-                            displaySearchState(SearchState.SUCCESS)
-                        } else {
-                            displaySearchState(SearchState.EMPTY)
-                        }
-                    } else {
+
+            tracksInteractor.searchTracks(searchText) { foundTracks ->
+                handler.post {
+                    if (foundTracks == null) {
                         displaySearchState(SearchState.ERROR)
+                    } else if (foundTracks.isNotEmpty()) {
+                        searchAdapter.updateTracks((foundTracks))
+                        displaySearchState(SearchState.SUCCESS)
+                    } else {
+                        displaySearchState(SearchState.EMPTY)
                     }
                 }
-
-                override fun onFailure(
-                    call: Call<TracksSearchResponse>,
-                    t: Throwable
-                ) {
-                    displaySearchState(SearchState.ERROR)
-                }
-
-            })
+            }
         }
     }
 
@@ -279,7 +260,7 @@ class SearchActivity : AppCompatActivity() {
             SearchState.EMPTY -> placeholderNothingFound.visibility = View.VISIBLE
             SearchState.ERROR -> placeholderNoInternet.visibility = View.VISIBLE
             SearchState.HISTORY -> {
-                historyAdapter.updateTracks(searchHistory.getHistory())
+                historyAdapter.updateTracks(searchHistoryInteractor.getHistory())
                 searchHistoryLinear.visibility = View.VISIBLE
             }
 
@@ -299,5 +280,4 @@ class SearchActivity : AppCompatActivity() {
 
         searchField.setText(searchText)
     }
-
 }

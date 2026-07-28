@@ -1,16 +1,19 @@
 package com.example.playlistmaker.data.network
 
-import ItunesApiService
 import com.example.playlistmaker.data.NetworkClient
 import com.example.playlistmaker.data.dto.Response
 import com.example.playlistmaker.data.dto.TracksSearchRequest
+import com.example.playlistmaker.data.dto.TracksSearchResponse
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class ItunesNetworkClient : NetworkClient {
     private val baseUrl = "https://itunes.apple.com/"
+
+    private var currentCall: Call<TracksSearchResponse>? = null
 
     private val client = OkHttpClient.Builder()
         .protocols(listOf(Protocol.HTTP_1_1))
@@ -28,16 +31,23 @@ class ItunesNetworkClient : NetworkClient {
     override fun doRequest(dto: Any): Response {
         return if (dto is TracksSearchRequest) {
             try {
-                val resp = itunesService.search(dto.query).execute()
+                val call = itunesService.search(dto.query)
+                currentCall = call
+                val resp = call.execute()
                 val body = resp.body() ?: Response()
 
                 body.apply { resultCode = resp.code() }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Response().apply { resultCode = -1 }
             }
 
         } else {
             Response().apply { resultCode = 400 }
         }
+    }
+
+    override fun cancelRequest() {
+        currentCall?.cancel()
+        currentCall = null
     }
 }

@@ -15,4 +15,8 @@ class TracksInteractorImpl(private val repository: TracksRepository) : TracksInt
             consumer.consume(repository.searchTracks(query))
         }
     }
+
+    override fun cancelSearch() {
+        repository.cancelSearch()
+    }
 }
