@@ -1,5 +1,7 @@
 package com.example.playlistmaker.player.ui
 
+import android.R.attr.country
+import android.R.attr.duration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -14,6 +16,7 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.search.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -23,20 +26,7 @@ class PlayerActivity : AppCompatActivity() {
         private const val UPDATE_TIME_DELAY = 100L
     }
 
-
-    private lateinit var toolbar: Toolbar
-    private lateinit var albumImage: ImageView
-    private lateinit var trackTitle: TextView
-    private lateinit var artistName: TextView
-    private lateinit var duration: TextView
-    private lateinit var albumNameLabel: TextView
-    private lateinit var albumNameValue: TextView
-    private lateinit var releaseDateLabel: TextView
-    private lateinit var releaseDateValue: TextView
-    private lateinit var genre: TextView
-    private lateinit var country: TextView
-    private lateinit var playButton: ImageView
-    private lateinit var playbackTime: TextView
+    private lateinit var binding: ActivityPlayerBinding
 
     private val handler = Handler(Looper.getMainLooper())
     private val audioPlayerInteractor = Creator.provideAudioPlayerInteractor()
@@ -45,7 +35,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private val timerRunnable = object : Runnable {
         override fun run() {
-            playbackTime.text = timeFormatter.format(audioPlayerInteractor.getCurrentPosition())
+            binding.playbackTime.text = timeFormatter.format(audioPlayerInteractor.getCurrentPosition())
             handler.postDelayed(this, UPDATE_TIME_DELAY)
         }
     }
@@ -53,26 +43,13 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_player)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.playerRoot)) { view, windowInsets ->
+        binding = ActivityPlayerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
             val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             windowInsets
         }
-
-        toolbar = findViewById(R.id.playerToolbar)
-        albumImage = findViewById(R.id.albumImage)
-        trackTitle = findViewById(R.id.trackTitle)
-        artistName = findViewById(R.id.artistName)
-        duration = findViewById(R.id.durationValue)
-        albumNameLabel = findViewById(R.id.albumLabel)
-        albumNameValue = findViewById(R.id.albumValue)
-        releaseDateLabel = findViewById(R.id.yearLabel)
-        releaseDateValue = findViewById(R.id.yearValue)
-        genre = findViewById(R.id.genreValue)
-        country = findViewById(R.id.countryValue)
-        playButton = findViewById(R.id.playButton)
-        playbackTime = findViewById(R.id.playbackTime)
 
         val track = intent.getSerializableExtra("track") as? Track ?: return
 
@@ -100,22 +77,22 @@ class PlayerActivity : AppCompatActivity() {
         audioPlayerInteractor.preparePlayer(
             url,
             onPreparedListener = {
-                playButton.isEnabled = true
+                binding.playButton.isEnabled = true
             },
             onCompletionListener = {
-                playButton.setImageResource(R.drawable.ic_player_play)
+                binding.playButton.setImageResource(R.drawable.ic_player_play)
                 handler.removeCallbacks(timerRunnable)
-                playbackTime.text = getString(R.string.default_timer_value)
+                binding.playbackTime.text = getString(R.string.default_timer_value)
             },
             onErrorListener = {
-                playButton.isEnabled = false
+                binding.playButton.isEnabled = false
             }
         )
     }
 
     private fun setupPlayButton() {
-        playButton.isEnabled = false
-        playButton.setOnClickListener {
+        binding.playButton.isEnabled = false
+        binding.playButton.setOnClickListener {
             audioPlayerInteractor.playbackControl(
                 onStartUI = { showPlayingUI() },
                 onPauseUI = { showPausedUI() }
@@ -124,50 +101,50 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun showPlayingUI() {
-        playButton.setImageResource(R.drawable.ic_player_pause)
+        binding.playButton.setImageResource(R.drawable.ic_player_pause)
         handler.post(timerRunnable)
     }
 
     private fun showPausedUI() {
-        playButton.setImageResource(R.drawable.ic_player_play)
+        binding.playButton.setImageResource(R.drawable.ic_player_play)
         handler.removeCallbacks(timerRunnable)
     }
 
     private fun setupToolBar() {
-        toolbar.setNavigationOnClickListener {
+        binding.playerToolbar.setNavigationOnClickListener {
             finish()
         }
     }
 
     private fun bindTrackData(track: Track) {
-        trackTitle.text = track.trackName
-        artistName.text = track.artistName
-        duration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTime)
+        binding.trackTitle.text = track.trackName
+        binding.artistName.text = track.artistName
+        binding.durationValue.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTime)
 
         if (track.collectionName.isNullOrEmpty()) {
-            albumNameLabel.isVisible = false
-            albumNameValue.isVisible = false
+            binding.albumNameLabel.isVisible = false
+            binding.albumNameValue.isVisible = false
         } else {
-            albumNameLabel.isVisible = true
-            albumNameValue.isVisible = true
-            albumNameValue.text = track.collectionName
+            binding.albumNameLabel.isVisible = true
+            binding.albumNameValue.isVisible = true
+            binding.albumNameValue.text = track.collectionName
         }
 
         if (track.releaseDate.isNullOrEmpty()) {
-            releaseDateLabel.isVisible = false
-            releaseDateValue.isVisible = false
+            binding.releaseDateLabel.isVisible = false
+            binding.releaseDateValue.isVisible = false
         } else {
-            releaseDateLabel.isVisible = true
-            releaseDateValue.isVisible = true
-            releaseDateValue.text = track.releaseDate.take(4)
+            binding.releaseDateLabel.isVisible = true
+            binding.releaseDateValue.isVisible = true
+            binding.releaseDateValue.text = track.releaseDate.take(4)
         }
 
-        genre.text = track.primaryGenreName
-        country.text = track.country
+        binding.genreValue.text = track.primaryGenreName
+        binding.countryValue.text = track.country
 
         Glide.with(this)
             .load(track.getCoverArtwork())
             .placeholder(R.drawable.ic_placeholder_album_312)
-            .into(albumImage)
+            .into(binding.albumImage)
     }
 }
