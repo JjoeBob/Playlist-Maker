@@ -2,7 +2,7 @@ package com.example.playlistmaker.app
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.Creator
+import com.example.playlistmaker.creator.Creator
 
 class App : Application() {
     companion object {
