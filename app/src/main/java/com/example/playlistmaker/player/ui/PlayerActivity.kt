@@ -1,44 +1,21 @@
 package com.example.playlistmaker.player.ui
 
-import android.R.attr.country
-import android.R.attr.duration
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.search.domain.models.Track
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
-    companion object {
-        private const val UPDATE_TIME_DELAY = 100L
-    }
 
     private lateinit var binding: ActivityPlayerBinding
-
-    private val handler = Handler(Looper.getMainLooper())
-    private val audioPlayerInteractor = Creator.provideAudioPlayerInteractor()
-
-    private val timeFormatter = SimpleDateFormat("m:ss", Locale.getDefault())
-
-    private val timerRunnable = object : Runnable {
-        override fun run() {
-            binding.playbackTime.text = timeFormatter.format(audioPlayerInteractor.getCurrentPosition())
-            handler.postDelayed(this, UPDATE_TIME_DELAY)
-        }
-    }
+    private lateinit var viewModel: PlayerViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,61 +30,37 @@ class PlayerActivity : AppCompatActivity() {
 
         val track = intent.getSerializableExtra("track") as? Track ?: return
 
+        viewModel = ViewModelProvider(
+            this,
+            PlayerViewModel.getFactory(track)
+        ).get(PlayerViewModel::class.java)
+
+        viewModel.observeTrackUI().observe(this) {
+            bindTrackData(it)
+        }
+
+        viewModel.observePlayerState().observe(this) {
+            render(it)
+        }
+
+        viewModel.observePlaybackTime().observe(this) {
+            binding.playbackTime.text = it
+        }
+
         setupPlayButton()
-        preparePlayer(track)
         setupToolBar()
-        bindTrackData(track)
     }
 
     override fun onPause() {
         super.onPause()
-        audioPlayerInteractor.pausePlayer()
-        showPausedUI()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        audioPlayerInteractor.releasePlayer()
-        handler.removeCallbacks(timerRunnable)
-    }
-
-    private fun preparePlayer(track: Track) {
-        val url = track.previewUrl
-
-        audioPlayerInteractor.preparePlayer(
-            url,
-            onPreparedListener = {
-                binding.playButton.isEnabled = true
-            },
-            onCompletionListener = {
-                binding.playButton.setImageResource(R.drawable.ic_player_play)
-                handler.removeCallbacks(timerRunnable)
-                binding.playbackTime.text = getString(R.string.default_timer_value)
-            },
-            onErrorListener = {
-                binding.playButton.isEnabled = false
-            }
-        )
+        viewModel.pausePlayer()
     }
 
     private fun setupPlayButton() {
         binding.playButton.isEnabled = false
         binding.playButton.setOnClickListener {
-            audioPlayerInteractor.playbackControl(
-                onStartUI = { showPlayingUI() },
-                onPauseUI = { showPausedUI() }
-            )
+            viewModel.onPlayButtonClicked()
         }
-    }
-
-    private fun showPlayingUI() {
-        binding.playButton.setImageResource(R.drawable.ic_player_pause)
-        handler.post(timerRunnable)
-    }
-
-    private fun showPausedUI() {
-        binding.playButton.setImageResource(R.drawable.ic_player_play)
-        handler.removeCallbacks(timerRunnable)
     }
 
     private fun setupToolBar() {
@@ -116,35 +69,55 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun bindTrackData(track: Track) {
-        binding.trackTitle.text = track.trackName
-        binding.artistName.text = track.artistName
-        binding.durationValue.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTime)
+    private fun bindTrackData(track: TrackPlayerUI) {
+        binding.apply {
+            trackTitle.text = track.trackName
+            artistName.text = track.artistName
+            durationValue.text = track.duration
 
-        if (track.collectionName.isNullOrEmpty()) {
-            binding.albumNameLabel.isVisible = false
-            binding.albumNameValue.isVisible = false
-        } else {
-            binding.albumNameLabel.isVisible = true
-            binding.albumNameValue.isVisible = true
-            binding.albumNameValue.text = track.collectionName
+            val hasAlbum = !track.albumName.isNullOrEmpty()
+            albumNameLabel.isVisible = hasAlbum
+            albumNameValue.isVisible = hasAlbum
+            albumNameValue.text = track.albumName
+
+            val hasReleaseYear = !track.releaseYear.isNullOrEmpty()
+            releaseDateLabel.isVisible = hasReleaseYear
+            releaseDateValue.isVisible = hasReleaseYear
+            releaseDateValue.text = track.releaseYear
+
+            genreValue.text = track.genre
+            countryValue.text = track.country
+
+            Glide.with(this@PlayerActivity)
+                .load(track.coverArtworkUrl)
+                .placeholder(R.drawable.ic_placeholder_album_312)
+                .into(albumImage)
         }
+    }
 
-        if (track.releaseDate.isNullOrEmpty()) {
-            binding.releaseDateLabel.isVisible = false
-            binding.releaseDateValue.isVisible = false
-        } else {
-            binding.releaseDateLabel.isVisible = true
-            binding.releaseDateValue.isVisible = true
-            binding.releaseDateValue.text = track.releaseDate.take(4)
+    private fun render(state: PlayerScreenState) {
+        binding.apply {
+            when (state) {
+                PlayerScreenState.Default -> {
+                    playButton.isEnabled = false
+                }
+
+                PlayerScreenState.Paused -> {
+                    playButton.setImageResource(R.drawable.ic_player_play)
+                }
+
+                PlayerScreenState.Playing -> {
+                    playButton.setImageResource(R.drawable.ic_player_pause)
+                }
+
+                PlayerScreenState.Prepared -> {
+                    playButton.isEnabled = true
+                }
+
+                PlayerScreenState.Completed -> {
+                    playButton.setImageResource(R.drawable.ic_player_play)
+                }
+            }
         }
-
-        binding.genreValue.text = track.primaryGenreName
-        binding.countryValue.text = track.country
-
-        Glide.with(this)
-            .load(track.getCoverArtwork())
-            .placeholder(R.drawable.ic_placeholder_album_312)
-            .into(binding.albumImage)
     }
 }

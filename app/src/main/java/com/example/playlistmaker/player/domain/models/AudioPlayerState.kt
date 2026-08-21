@@ -1,8 +1,10 @@
 package com.example.playlistmaker.player.domain.models
 
-enum class PlayerState {
+enum class AudioPlayerState {
     DEFAULT,
     PREPARED,
     PLAYING,
-    PAUSED
+    PAUSED,
+    ERROR,
+    COMPLETED
 }

@@ -1,45 +1,43 @@
 package com.example.playlistmaker.player.domain.impl
 
-import com.example.playlistmaker.player.domain.models.PlayerState
 import com.example.playlistmaker.player.domain.api.AudioPlayer
 import com.example.playlistmaker.player.domain.api.AudioPlayerInteractor
+import com.example.playlistmaker.player.domain.models.AudioPlayerState
 
 class AudioPlayerInteractorImpl(val audioPlayer: AudioPlayer) : AudioPlayerInteractor {
-    private var playerState = PlayerState.DEFAULT
+    private var playerState = AudioPlayerState.DEFAULT
+    private var onStateChangeListener: ((AudioPlayerState) -> Unit)? = null
 
     override fun startPlayer() {
         audioPlayer.start()
-        playerState = PlayerState.PLAYING
+        updateState(AudioPlayerState.PLAYING)
     }
 
     override fun pausePlayer() {
-        audioPlayer.pause()
-        playerState = PlayerState.PAUSED
+        if (playerState == AudioPlayerState.PLAYING) {
+            audioPlayer.pause()
+            updateState(AudioPlayerState.PAUSED)
+        }
     }
 
     override fun releasePlayer() {
         audioPlayer.release()
-        playerState = PlayerState.DEFAULT
+        updateState(AudioPlayerState.DEFAULT)
     }
 
     override fun preparePlayer(
-        url: String?,
-        onPreparedListener: () -> Unit,
-        onCompletionListener: () -> Unit,
-        onErrorListener: () -> Unit
+        url: String?
     ) {
         if (url.isNullOrEmpty()) {
-            onErrorListener()
+            updateState(AudioPlayerState.ERROR)
         } else {
             audioPlayer.preparePlayer(
                 url,
                 onPreparedListener = {
-                    playerState = PlayerState.PREPARED
-                    onPreparedListener()
+                    updateState(AudioPlayerState.PREPARED)
                 },
                 onCompletionListener = {
-                    playerState = PlayerState.PREPARED
-                    onCompletionListener()
+                    updateState(AudioPlayerState.COMPLETED)
                 }
             )
         }
@@ -49,19 +47,12 @@ class AudioPlayerInteractorImpl(val audioPlayer: AudioPlayer) : AudioPlayerInter
         return audioPlayer.getCurrentPosition()
     }
 
-    override fun playbackControl(onStartUI: () -> Unit, onPauseUI: () -> Unit) {
-        when (playerState) {
-            PlayerState.PLAYING -> {
-                pausePlayer()
-                onPauseUI()
-            }
+    override fun setOnStateChangeListener(onStateChangeListener: (AudioPlayerState) -> Unit) {
+        this.onStateChangeListener = onStateChangeListener
+    }
 
-            PlayerState.PREPARED, PlayerState.PAUSED -> {
-                startPlayer()
-                onStartUI()
-            }
-
-            PlayerState.DEFAULT -> {}
-        }
+    private fun updateState(state: AudioPlayerState) {
+        playerState = state
+        onStateChangeListener?.invoke(playerState)
     }
 }
