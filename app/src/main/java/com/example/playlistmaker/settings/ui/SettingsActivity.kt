@@ -1,43 +1,32 @@
 package com.example.playlistmaker.settings.ui
 
 import android.os.Bundle
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.R
 import com.example.playlistmaker.app.App
-import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.settings.domain.models.ThemeSettings
-import com.google.android.material.switchmaterial.SwitchMaterial
+import com.example.playlistmaker.databinding.ActivitySettingsBinding
 
 class SettingsActivity : AppCompatActivity() {
-    private val settingsInteractor by lazy { Creator.provideSettingsInteractor(this) }
-    private val sharingInteractor by lazy { Creator.provideSharingInteractor(this) }
-
-    lateinit var toolbar: Toolbar
-    lateinit var shareButton: TextView
-    lateinit var supportButton: TextView
-    lateinit var agreementButton: TextView
-    lateinit var themeSwitcher: SwitchMaterial
+    private lateinit var binding: ActivitySettingsBinding
+    private val viewModel: SettingsViewModel by viewModels {
+        SettingsViewModel.getFactory(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_settings)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root)) { view, windowInsets ->
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
             val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             windowInsets
         }
-
-        toolbar = findViewById(R.id.settings_toolbar)
-        shareButton = findViewById(R.id.settings_share_button)
-        supportButton = findViewById(R.id.settings_support_button)
-        agreementButton = findViewById(R.id.settings_agreement_button)
-        themeSwitcher = findViewById(R.id.themeSwitcher)
 
         setupToolBar()
         setupShareButton()
@@ -47,35 +36,37 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupToolBar() {
-        toolbar.setNavigationOnClickListener {
+        binding.toolbar.setNavigationOnClickListener {
             finish()
         }
     }
 
     private fun setupShareButton() {
-        shareButton.setOnClickListener {
-            sharingInteractor.share()
+        binding.shareButton.setOnClickListener {
+            viewModel.share()
         }
     }
 
     private fun setupSupportButton() {
-        supportButton.setOnClickListener {
-            sharingInteractor.openSupport()
+        binding.supportButton.setOnClickListener {
+            viewModel.openSupport()
         }
     }
 
     private fun setupAgreementButton() {
-        agreementButton.setOnClickListener {
-            sharingInteractor.openAgreement()
+        binding.agreementButton.setOnClickListener {
+            viewModel.openAgreement()
         }
     }
 
     private fun setupThemeSwitcher() {
-        themeSwitcher.isChecked = settingsInteractor.getThemeSettings().isDarkTheme
-        themeSwitcher.setOnCheckedChangeListener { _, checked ->
-            (applicationContext as App).switchTheme(checked)
+        binding.themeSwitcher.isChecked = viewModel.isDarkTheme()
+        binding.themeSwitcher.setOnCheckedChangeListener { _, checked ->
+            viewModel.updateThemeSettings(checked)
+        }
 
-            settingsInteractor.updateThemeSettings(ThemeSettings(checked))
+        viewModel.getThemeSettingsLiveData().observe(this) { settings ->
+            (applicationContext as App).switchTheme(settings.isDarkTheme)
         }
     }
 }

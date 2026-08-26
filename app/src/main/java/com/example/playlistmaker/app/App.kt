@@ -11,24 +11,24 @@ class App : Application() {
 
     private val settingsInteractor by lazy { Creator.provideSettingsInteractor(this) }
 
-    var darkTheme = false
+    var isDarkTheme = false
 
     override fun onCreate() {
         super.onCreate()
 
-        darkTheme = settingsInteractor.getThemeSettings().isDarkTheme
+        isDarkTheme = settingsInteractor.getThemeSettings().isDarkTheme
 
-        switchTheme(darkTheme)
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkTheme) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
     }
 
     fun switchTheme(darkThemeEnabled: Boolean) {
-        darkTheme = darkThemeEnabled
+        isDarkTheme = darkThemeEnabled
         AppCompatDelegate.setDefaultNightMode(
-            if (darkThemeEnabled) {
-                AppCompatDelegate.MODE_NIGHT_YES
-            } else {
-                AppCompatDelegate.MODE_NIGHT_NO
-            }
+            if (darkThemeEnabled) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
         )
     }
 }
