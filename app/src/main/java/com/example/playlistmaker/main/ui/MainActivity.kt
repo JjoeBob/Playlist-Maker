@@ -2,34 +2,28 @@ package com.example.playlistmaker.main.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.ActivityMainBinding
 import com.example.playlistmaker.library.ui.LibraryActivity
 import com.example.playlistmaker.search.ui.SearchActivity
 import com.example.playlistmaker.settings.ui.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
-    lateinit var searchButton: Button
-    lateinit var libraryButton: Button
-    lateinit var settingsButton: Button
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root)) { view, windowInsets ->
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
             val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             windowInsets
         }
-
-        searchButton = findViewById(R.id.main_search_button)
-        libraryButton = findViewById(R.id.main_library_button)
-        settingsButton = findViewById(R.id.main_settings_button)
 
         setupSearchButton()
         setupLibraryButton()
@@ -37,19 +31,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupSearchButton() {
-        searchButton.setOnClickListener {
+        binding.searchButton.setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
     }
 
     private fun setupLibraryButton() {
-        libraryButton.setOnClickListener {
+        binding.libraryButton.setOnClickListener {
             startActivity(Intent(this, LibraryActivity::class.java))
         }
     }
 
     private fun setupSettingsButton() {
-        settingsButton.setOnClickListener {
+        binding.settingsButton.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
     }
