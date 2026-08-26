@@ -9,7 +9,7 @@
     android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/search_toolbar"
+        android:id="@+id/toolbar"
         style="@style/ToolBar"
         app:navigationIcon="@drawable/ic_arrow_back_24"
         app:title="@string/search_title" />
@@ -25,7 +25,7 @@
         android:paddingVertical="8dp">
 
         <EditText
-            android:id="@+id/search_field"
+            android:id="@+id/searchField"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -44,7 +44,7 @@
             app:drawableTint="?attr/searchFieldOnColor" />
 
         <ImageView
-            android:id="@+id/search_field_clear"
+            android:id="@+id/clearButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -59,7 +59,7 @@
         android:layout_weight="1">
 
         <ProgressBar
-            android:id="@+id/progress_bar"
+            android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -68,7 +68,7 @@
             android:layout_marginTop="124dp" />
 
         <LinearLayout
-            android:id="@+id/placeholder_nothing_found"
+            android:id="@+id/placeholderNothingFound"
             style="@style/PlaceholderLinear"
             tools:visibility="gone">
 
@@ -84,7 +84,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/placeholder_no_internet"
+            android:id="@+id/placeholderNoInternet"
             style="@style/PlaceholderLinear"
             tools:visibility="gone">
 
@@ -100,7 +100,7 @@
                 android:text="@string/search_no_internet" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/search_update_button"
+                android:id="@+id/searchUpdateButton"
                 style="@style/SearchScreenActionButton"
                 android:layout_marginTop="24dp"
                 android:text="@string/search_update_button" />
@@ -108,14 +108,14 @@
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/search_recycler_view"
+            android:id="@+id/tracksRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:visibility="gone" />
 
         <LinearLayout
-            android:id="@+id/search_history"
+            android:id="@+id/searchHistoryLinear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -140,7 +140,7 @@
                         tools:visibility="gone" />
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/search_history_recycler_view"
+                        android:id="@+id/searchHistoryRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
@@ -149,7 +149,7 @@
                         tools:visibility="gone" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/clear_search_history"
+                        android:id="@+id/clearHistoryButton"
                         style="@style/SearchScreenActionButton"
                         android:layout_marginVertical="24dp"
                         android:text="@string/clear_search_history"
