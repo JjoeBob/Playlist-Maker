@@ -1,13 +1,9 @@
-package com.example.playlistmaker.network
+package com.example.playlistmaker.data.dto
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-data class SearchResponse(
-    val results: List<Track>
-)
-
-data class Track(
+data class TrackDto(
     val trackId: Long,
     val trackName: String,
     val artistName: String,
@@ -18,8 +14,4 @@ data class Track(
     val primaryGenreName: String?,
     val country: String?,
     val previewUrl: String?
-) : Serializable {
-    fun getCoverArtwork(): String? {
-        return artworkUrl?.replaceAfterLast('/', "512x512bb.jpg")
-    }
-}
+)

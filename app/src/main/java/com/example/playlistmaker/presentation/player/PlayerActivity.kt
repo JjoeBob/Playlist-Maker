@@ -1,6 +1,5 @@
 package com.example.playlistmaker.presentation.player
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,20 +12,17 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
+import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
-import com.example.playlistmaker.network.Track
+import com.example.playlistmaker.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
     companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-
         private const val UPDATE_TIME_DELAY = 100L
     }
+
 
     private lateinit var toolbar: Toolbar
     private lateinit var albumImage: ImageView
@@ -43,14 +39,13 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var playbackTime: TextView
 
     private val handler = Handler(Looper.getMainLooper())
+    private val audioPlayerInteractor = Creator.provideAudioPlayerInteractor()
 
-    private var mediaPlayer = MediaPlayer()
-    private var playerState = STATE_DEFAULT
     private val timeFormatter = SimpleDateFormat("m:ss", Locale.getDefault())
 
     private val timerRunnable = object : Runnable {
         override fun run() {
-            playbackTime.text = timeFormatter.format(mediaPlayer.currentPosition)
+            playbackTime.text = timeFormatter.format(audioPlayerInteractor.getCurrentPosition())
             handler.postDelayed(this, UPDATE_TIME_DELAY)
         }
     }
@@ -89,67 +84,53 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        audioPlayerInteractor.pausePlayer()
+        showPausedUI()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer.release()
+        audioPlayerInteractor.releasePlayer()
         handler.removeCallbacks(timerRunnable)
     }
 
     private fun preparePlayer(track: Track) {
         val url = track.previewUrl
 
-        if (!url.isNullOrEmpty()) {
-            mediaPlayer.setDataSource(url)
-            mediaPlayer.prepareAsync()
-            mediaPlayer.setOnPreparedListener {
+        audioPlayerInteractor.preparePlayer(
+            url,
+            onPreparedListener = {
                 playButton.isEnabled = true
-                playerState = STATE_PREPARED
-            }
-            mediaPlayer.setOnCompletionListener {
+            },
+            onCompletionListener = {
                 playButton.setImageResource(R.drawable.ic_player_play)
-                playerState = STATE_PREPARED
                 handler.removeCallbacks(timerRunnable)
                 playbackTime.text = getString(R.string.default_timer_value)
+            },
+            onErrorListener = {
+                playButton.isEnabled = false
             }
-        } else {
-            playButton.isEnabled = false
-        }
+        )
     }
 
     private fun setupPlayButton() {
         playButton.isEnabled = false
         playButton.setOnClickListener {
-            playbackControl()
+            audioPlayerInteractor.playbackControl(
+                onStartUI = { showPlayingUI() },
+                onPauseUI = { showPausedUI() }
+            )
         }
     }
 
-    private fun startPlayer() {
-        mediaPlayer.start()
+    private fun showPlayingUI() {
         playButton.setImageResource(R.drawable.ic_player_pause)
-        playerState = STATE_PLAYING
         handler.post(timerRunnable)
     }
 
-    private fun pausePlayer() {
-        mediaPlayer.pause()
+    private fun showPausedUI() {
         playButton.setImageResource(R.drawable.ic_player_play)
-        playerState = STATE_PAUSED
         handler.removeCallbacks(timerRunnable)
-    }
-
-    private fun playbackControl() {
-        when (playerState) {
-            STATE_PLAYING -> {
-                pausePlayer()
-            }
-
-            STATE_PREPARED, STATE_PAUSED -> {
-                startPlayer()
-            }
-        }
     }
 
     private fun setupToolBar() {
