@@ -173,25 +173,25 @@
             app:layout_constraintTop_toBottomOf="@id/playbackTime" />
 
         <TextView
-            android:id="@+id/albumLabel"
+            android:id="@+id/albumNameLabel"
             style="@style/PlayerTrackLabel"
             android:text="@string/player_album"
             app:layout_constraintStart_toStartOf="@id/startGuideLine16"
             app:layout_constraintTop_toBottomOf="@id/durationLabel" />
 
         <TextView
-            android:id="@+id/yearLabel"
+            android:id="@+id/releaseDateLabel"
             style="@style/PlayerTrackLabel"
             android:text="@string/player_year"
             app:layout_constraintStart_toStartOf="@id/startGuideLine16"
-            app:layout_constraintTop_toBottomOf="@id/albumLabel" />
+            app:layout_constraintTop_toBottomOf="@id/albumNameLabel" />
 
         <TextView
             android:id="@+id/genreLabel"
             style="@style/PlayerTrackLabel"
             android:text="@string/player_genre"
             app:layout_constraintStart_toStartOf="@id/startGuideLine16"
-            app:layout_constraintTop_toBottomOf="@id/yearLabel" />
+            app:layout_constraintTop_toBottomOf="@id/releaseDateLabel" />
 
         <TextView
             android:id="@+id/countryLabel"
@@ -209,22 +209,22 @@
             tools:text="5:35" />
 
         <TextView
-            android:id="@+id/albumValue"
+            android:id="@+id/albumNameValue"
             style="@style/PlayerTrackValue"
             android:layout_width="0dp"
             android:layout_marginStart="16dp"
             android:ellipsize="end"
             android:gravity="end"
             android:maxLines="1"
-            app:layout_constraintBaseline_toBaselineOf="@id/albumLabel"
+            app:layout_constraintBaseline_toBaselineOf="@id/albumNameLabel"
             app:layout_constraintEnd_toEndOf="@id/endGuideLine16"
-            app:layout_constraintStart_toEndOf="@id/albumLabel"
+            app:layout_constraintStart_toEndOf="@id/albumNameLabel"
             tools:text="Yesterday" />
 
         <TextView
-            android:id="@+id/yearValue"
+            android:id="@+id/releaseDateValue"
             style="@style/PlayerTrackValue"
-            app:layout_constraintBaseline_toBaselineOf="@id/yearLabel"
+            app:layout_constraintBaseline_toBaselineOf="@id/releaseDateLabel"
             app:layout_constraintEnd_toEndOf="@id/endGuideLine16"
             tools:text="1965" />
 
