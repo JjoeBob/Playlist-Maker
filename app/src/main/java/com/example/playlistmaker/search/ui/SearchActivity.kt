@@ -58,6 +58,11 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateHistoryVisibility()
+    }
+
     private fun setupToolBar() {
         binding.toolbar.setNavigationOnClickListener {
             finish()

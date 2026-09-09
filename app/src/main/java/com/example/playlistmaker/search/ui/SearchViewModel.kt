@@ -12,10 +12,12 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.app.App
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.domain.api.SearchHistoryInteractor
+import com.example.playlistmaker.search.domain.api.TracksInteractor
 import com.example.playlistmaker.search.domain.models.Track
 
-class SearchViewModel(private val searchHistoryInteractor: SearchHistoryInteractor) : ViewModel() {
-    private val tracksInteractor = Creator.provideTracksInteractor()
+class SearchViewModel(
+    private val searchHistoryInteractor: SearchHistoryInteractor,
+    private val tracksInteractor: TracksInteractor) : ViewModel() {
     private val handler = Handler(Looper.getMainLooper())
 
     private var latestSearchText: String? = null
@@ -111,7 +113,8 @@ class SearchViewModel(private val searchHistoryInteractor: SearchHistoryInteract
             initializer {
                 val app = this[APPLICATION_KEY] as App
                 val historyInteractor = Creator.provideSearchHistoryInteractor(app)
-                SearchViewModel(historyInteractor)
+                val tracksInteractor = Creator.provideTracksInteractor()
+                SearchViewModel(historyInteractor, tracksInteractor)
             }
         }
     }

@@ -6,15 +6,13 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
-import com.example.playlistmaker.R
 import com.example.playlistmaker.app.App
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
     private val viewModel: SettingsViewModel by viewModels {
-        SettingsViewModel.getFactory(this)
+        SettingsViewModel.getFactory()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,12 +58,12 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupThemeSwitcher() {
-        binding.themeSwitcher.isChecked = viewModel.isDarkTheme()
         binding.themeSwitcher.setOnCheckedChangeListener { _, checked ->
             viewModel.updateThemeSettings(checked)
         }
 
-        viewModel.getThemeSettingsLiveData().observe(this) { settings ->
+        viewModel.observeThemeSettingsLiveData().observe(this) { settings ->
+            binding.themeSwitcher.isChecked = settings.isDarkTheme
             (applicationContext as App).switchTheme(settings.isDarkTheme)
         }
     }

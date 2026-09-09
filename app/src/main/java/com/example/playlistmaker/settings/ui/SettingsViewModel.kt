@@ -1,12 +1,13 @@
 package com.example.playlistmaker.settings.ui
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.playlistmaker.app.App
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.settings.domain.api.SettingsInteractor
 import com.example.playlistmaker.settings.domain.models.ThemeSettings
@@ -18,9 +19,11 @@ class SettingsViewModel(
 ) : ViewModel() {
 
     private val themeSettingsLiveData = MutableLiveData<ThemeSettings>()
-    fun getThemeSettingsLiveData(): LiveData<ThemeSettings> = themeSettingsLiveData
-    
-    fun isDarkTheme() = settingsInteractor.getThemeSettings().isDarkTheme
+    fun observeThemeSettingsLiveData(): LiveData<ThemeSettings> = themeSettingsLiveData
+
+    init {
+        themeSettingsLiveData.value = settingsInteractor.getThemeSettings()
+    }
 
     fun updateThemeSettings(checked: Boolean) {
         val settings = ThemeSettings(checked)
@@ -41,11 +44,11 @@ class SettingsViewModel(
     }
 
     companion object {
-        fun getFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
+        fun getFactory(): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val appContext = context.applicationContext
-                val settingsInteractor = Creator.provideSettingsInteractor(appContext)
-                val sharingInteractor = Creator.provideSharingInteractor(appContext)
+                val app = this[APPLICATION_KEY] as App
+                val settingsInteractor = Creator.provideSettingsInteractor(app)
+                val sharingInteractor = Creator.provideSharingInteractor(app)
                 SettingsViewModel(settingsInteractor, sharingInteractor)
             }
         }

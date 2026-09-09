@@ -100,22 +100,19 @@ class PlayerActivity : AppCompatActivity() {
             when (state) {
                 PlayerScreenState.Default -> {
                     playButton.isEnabled = false
+                    playButton.setImageResource(R.drawable.ic_player_play)
                 }
 
+                PlayerScreenState.Prepared,
+                PlayerScreenState.Completed,
                 PlayerScreenState.Paused -> {
                     playButton.setImageResource(R.drawable.ic_player_play)
+                    playButton.isEnabled = true
                 }
 
                 PlayerScreenState.Playing -> {
                     playButton.setImageResource(R.drawable.ic_player_pause)
-                }
-
-                PlayerScreenState.Prepared -> {
                     playButton.isEnabled = true
-                }
-
-                PlayerScreenState.Completed -> {
-                    playButton.setImageResource(R.drawable.ic_player_play)
                 }
             }
         }
