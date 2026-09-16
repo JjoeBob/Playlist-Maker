@@ -9,7 +9,7 @@
 
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/settings_toolbar"
+        android:id="@+id/toolbar"
         style="@style/ToolBar"
         android:layout_marginBottom="@dimen/settings_margin_large"
         app:navigationIcon="@drawable/ic_arrow_back_24"
@@ -23,21 +23,21 @@
         app:trackTint="@color/switch_track_selector" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/settings_share_button"
+        android:id="@+id/shareButton"
         style="@style/SettingsItem"
         android:drawableEnd="@drawable/ic_share_24"
         android:drawableTint="?attr/colorOnSurfaceVariant"
         android:text="@string/settings_share_app" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/settings_support_button"
+        android:id="@+id/supportButton"
         style="@style/SettingsItem"
         android:drawableEnd="@drawable/ic_support_24"
         android:drawableTint="?attr/colorOnSurfaceVariant"
         android:text="@string/settings_contact_support" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/settings_agreement_button"
+        android:id="@+id/agreementButton"
         style="@style/SettingsItem"
         android:drawableEnd="@drawable/ic_arrow_forward_24"
         android:drawableTint="?attr/colorOnSurfaceVariant"

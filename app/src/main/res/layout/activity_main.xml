@@ -14,7 +14,7 @@
         app:titleTextColor="@color/yp_white"/>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/main_search_button"
+        android:id="@+id/searchButton"
         style="@style/MenuButton"
         android:layout_marginHorizontal="@dimen/standard_padding"
         android:layout_marginBottom="@dimen/standard_padding"
@@ -22,7 +22,7 @@
         app:icon="@drawable/ic_search_24" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/main_library_button"
+        android:id="@+id/libraryButton"
         style="@style/MenuButton"
         android:layout_marginHorizontal="@dimen/standard_padding"
         android:layout_marginBottom="@dimen/standard_padding"
@@ -30,7 +30,7 @@
         app:icon="@drawable/ic_library_24" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/main_settings_button"
+        android:id="@+id/settingsButton"
         style="@style/MenuButton"
         android:layout_marginHorizontal="@dimen/standard_padding"
         android:layout_marginBottom="28dp"
