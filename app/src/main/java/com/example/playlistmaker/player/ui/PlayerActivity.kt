@@ -49,6 +49,8 @@ class PlayerActivity : AppCompatActivity() {
 
         setupPlayButton()
         setupToolBar()
+
+        viewModel.prepare()
     }
 
     override fun onPause() {

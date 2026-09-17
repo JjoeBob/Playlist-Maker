@@ -9,15 +9,19 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.player.domain.api.AudioPlayerInteractor
 import com.example.playlistmaker.player.domain.models.AudioPlayerState
 import com.example.playlistmaker.search.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerViewModel(private val track: Track) : ViewModel() {
+class PlayerViewModel(
+    private val track: Track,
+    private val audioPlayerInteractor: AudioPlayerInteractor
+) : ViewModel() {
+    private var isInitialized = false
 
     private val handler = Handler(Looper.getMainLooper())
-    private val audioPlayerInteractor = Creator.provideAudioPlayerInteractor()
     private val timeFormatter = SimpleDateFormat("m:ss", Locale.getDefault())
     private val timerRunnable = object : Runnable {
         override fun run() {
@@ -35,7 +39,9 @@ class PlayerViewModel(private val track: Track) : ViewModel() {
     private val trackUILiveData = MutableLiveData<TrackPlayerUI>()
     fun observeTrackUI(): LiveData<TrackPlayerUI> = trackUILiveData
 
-    init {
+    fun prepare() {
+        if (isInitialized) return
+
         audioPlayerInteractor.setOnStateChangeListener { playerState ->
             val uiState = when (playerState) {
                 AudioPlayerState.PREPARED -> {
@@ -70,6 +76,8 @@ class PlayerViewModel(private val track: Track) : ViewModel() {
 
         preparePlayer(track)
         trackUILiveData.postValue(mapToUI(track))
+
+        isInitialized = true
     }
 
     private fun mapToUI(track: Track): TrackPlayerUI {
@@ -127,7 +135,10 @@ class PlayerViewModel(private val track: Track) : ViewModel() {
     companion object {
         fun getFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                PlayerViewModel(track)
+                PlayerViewModel(
+                    track,
+                    Creator.provideAudioPlayerInteractor()
+                )
             }
         }
 
