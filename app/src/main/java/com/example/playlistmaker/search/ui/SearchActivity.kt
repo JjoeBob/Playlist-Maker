@@ -6,7 +6,6 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -20,6 +19,7 @@ import com.example.playlistmaker.search.ui.SearchScreenState.Error
 import com.example.playlistmaker.search.ui.SearchScreenState.History
 import com.example.playlistmaker.search.ui.SearchScreenState.InProgress
 import com.example.playlistmaker.search.ui.SearchScreenState.Success
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
@@ -27,9 +27,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyAdapter: TrackAdapter
 
     private lateinit var binding: ActivitySearchBinding
-    private val viewModel: SearchViewModel by viewModels {
-        SearchViewModel.getFactory()
-    }
+    private val viewModel: SearchViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,7 +105,7 @@ class SearchActivity : AppCompatActivity() {
             if (viewModel.clickDebounce()) {
                 viewModel.onTrackClicked(track)
                 val playerIntent = Intent(this, PlayerActivity::class.java)
-                playerIntent.putExtra("track", track)
+                playerIntent.putExtra(TRACK_KEY, track)
                 startActivity(playerIntent)
             }
         }
@@ -117,7 +115,7 @@ class SearchActivity : AppCompatActivity() {
         historyAdapter = TrackAdapter(emptyList()) { track ->
             if (viewModel.clickDebounce()) {
                 val playerIntent = Intent(this, PlayerActivity::class.java)
-                playerIntent.putExtra("track", track)
+                playerIntent.putExtra(TRACK_KEY, track)
                 startActivity(playerIntent)
             }
         }
@@ -185,5 +183,9 @@ class SearchActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    companion object {
+        private const val TRACK_KEY = "track"
     }
 }

@@ -1,14 +1,9 @@
 package com.example.playlistmaker.player.ui
 
 import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.player.domain.api.AudioPlayerInteractor
 import com.example.playlistmaker.player.domain.models.AudioPlayerState
 import com.example.playlistmaker.search.domain.models.Track
@@ -17,12 +12,12 @@ import java.util.Locale
 
 class PlayerViewModel(
     private val track: Track,
-    private val audioPlayerInteractor: AudioPlayerInteractor
+    private val audioPlayerInteractor: AudioPlayerInteractor,
+    private val timeFormatter: SimpleDateFormat,
+    private val handler: Handler
 ) : ViewModel() {
     private var isInitialized = false
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val timeFormatter = SimpleDateFormat("m:ss", Locale.getDefault())
     private val timerRunnable = object : Runnable {
         override fun run() {
             playbackTimeLiveData.postValue(timeFormatter.format(audioPlayerInteractor.getCurrentPosition()))
@@ -133,15 +128,6 @@ class PlayerViewModel(
     }
 
     companion object {
-        fun getFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                PlayerViewModel(
-                    track,
-                    Creator.provideAudioPlayerInteractor()
-                )
-            }
-        }
-
         private const val UPDATE_TIME_DELAY = 100L
     }
 }
