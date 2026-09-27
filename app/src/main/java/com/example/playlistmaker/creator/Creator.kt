@@ -1,6 +1,7 @@
 package com.example.playlistmaker.creator
 
 import android.content.Context
+import android.media.MediaPlayer
 import com.example.playlistmaker.app.App
 import com.example.playlistmaker.player.data.AudioPlayerImpl
 import com.example.playlistmaker.sharing.data.ExternalNavigatorImpl
@@ -21,15 +22,33 @@ import com.example.playlistmaker.sharing.domain.api.SharingInteractor
 import com.example.playlistmaker.search.domain.api.TracksInteractor
 import com.example.playlistmaker.search.domain.api.TracksRepository
 import com.example.playlistmaker.player.domain.impl.AudioPlayerInteractorImpl
+import com.example.playlistmaker.search.data.network.ItunesApiService
 import com.example.playlistmaker.search.domain.impl.SearchHistoryInteractorImpl
 import com.example.playlistmaker.settings.domain.impl.SettingsInteractorImpl
 import com.example.playlistmaker.sharing.domain.impl.SharingInteractorImpl
 import com.example.playlistmaker.search.domain.impl.TracksInteractorImpl
 import com.google.gson.Gson
+import okhttp3.OkHttpClient
+import okhttp3.Protocol
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 object Creator {
     private fun getTracksRepository(): TracksRepository {
-        return TracksRepositoryImpl(ItunesNetworkClient())
+        val baseUrl = "https://itunes.apple.com/"
+
+        val client = OkHttpClient.Builder()
+            .protocols(listOf(Protocol.HTTP_1_1))
+            .build()
+
+        val itunesApi = Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ItunesApiService::class.java)
+
+        return TracksRepositoryImpl(ItunesNetworkClient(itunesApi))
     }
 
     fun provideTracksInteractor(): TracksInteractor {
@@ -58,7 +77,7 @@ object Creator {
     }
 
     private fun getAudioPlayer(): AudioPlayer {
-        return AudioPlayerImpl()
+        return AudioPlayerImpl(MediaPlayer())
     }
 
     fun provideAudioPlayerInteractor(): AudioPlayerInteractor {

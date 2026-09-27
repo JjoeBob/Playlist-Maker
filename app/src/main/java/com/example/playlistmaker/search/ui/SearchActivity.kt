@@ -2,17 +2,15 @@ package com.example.playlistmaker.search.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.search.ui.SearchScreenState.Clear
@@ -21,6 +19,7 @@ import com.example.playlistmaker.search.ui.SearchScreenState.Error
 import com.example.playlistmaker.search.ui.SearchScreenState.History
 import com.example.playlistmaker.search.ui.SearchScreenState.InProgress
 import com.example.playlistmaker.search.ui.SearchScreenState.Success
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
@@ -28,9 +27,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyAdapter: TrackAdapter
 
     private lateinit var binding: ActivitySearchBinding
-    private val viewModel: SearchViewModel by viewModels {
-        SearchViewModel.getFactory()
-    }
+    private val viewModel: SearchViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,33 +74,15 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupSearch() {
-        val searchOnFocusChangeListener = View.OnFocusChangeListener { _, _ ->
+
+        binding.searchField.setOnFocusChangeListener { _, _ ->
             updateHistoryVisibility()
         }
+        binding.searchField.doOnTextChanged { text, _, _, _ ->
+            binding.clearButton.isVisible = !text.isNullOrEmpty()
 
-        val searchTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(
-                s: CharSequence?,
-                start: Int,
-                before: Int,
-                count: Int
-            ) {
-                binding.clearButton.isVisible = !s.isNullOrEmpty()
-
-                viewModel.searchDebounce(s?.toString().orEmpty())
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
+            viewModel.searchDebounce(text?.toString().orEmpty())
         }
-
-        binding.searchField.onFocusChangeListener = searchOnFocusChangeListener
-        binding.searchField.addTextChangedListener(searchTextWatcher)
 
         binding.searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -126,7 +105,7 @@ class SearchActivity : AppCompatActivity() {
             if (viewModel.clickDebounce()) {
                 viewModel.onTrackClicked(track)
                 val playerIntent = Intent(this, PlayerActivity::class.java)
-                playerIntent.putExtra("track", track)
+                playerIntent.putExtra(TRACK_KEY, track)
                 startActivity(playerIntent)
             }
         }
@@ -136,7 +115,7 @@ class SearchActivity : AppCompatActivity() {
         historyAdapter = TrackAdapter(emptyList()) { track ->
             if (viewModel.clickDebounce()) {
                 val playerIntent = Intent(this, PlayerActivity::class.java)
-                playerIntent.putExtra("track", track)
+                playerIntent.putExtra(TRACK_KEY, track)
                 startActivity(playerIntent)
             }
         }
@@ -204,5 +183,9 @@ class SearchActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    companion object {
+        private const val TRACK_KEY = "track"
     }
 }

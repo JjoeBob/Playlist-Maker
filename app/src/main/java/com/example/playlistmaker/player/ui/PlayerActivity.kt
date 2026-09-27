@@ -6,16 +6,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.search.domain.models.Track
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class PlayerActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityPlayerBinding
-    private lateinit var viewModel: PlayerViewModel
+    private val viewModel by viewModel<PlayerViewModel> {
+        parametersOf(intent.getSerializableExtra("track") as? Track)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,13 +30,6 @@ class PlayerActivity : AppCompatActivity() {
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             windowInsets
         }
-
-        val track = intent.getSerializableExtra("track") as? Track ?: return
-
-        viewModel = ViewModelProvider(
-            this,
-            PlayerViewModel.getFactory(track)
-        ).get(PlayerViewModel::class.java)
 
         viewModel.observeTrackUI().observe(this) {
             bindTrackData(it)
@@ -49,6 +45,8 @@ class PlayerActivity : AppCompatActivity() {
 
         setupPlayButton()
         setupToolBar()
+
+        viewModel.prepare()
     }
 
     override fun onPause() {
