@@ -11,7 +11,6 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         style="@style/ToolBar"
-        android:layout_marginBottom="@dimen/settings_margin_large"
         app:navigationIcon="@drawable/ic_arrow_back_24"
         app:title="@string/settings_title" />
 

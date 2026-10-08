@@ -72,7 +72,7 @@
         <item name="android:tint">?attr/colorOnSurfaceVariant</item>
     </style>
 
-    <style name="SearchScreenActionButton">
+    <style name="RoundedActionButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:backgroundTint">?attr/colorOnSurface</item>
@@ -89,7 +89,7 @@
         <item name="cornerRadius">54dp</item>
     </style>
 
-    <style name="SearchStateText">
+    <style name="EmptyStateText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
@@ -98,7 +98,7 @@
         <item name="android:textSize">19sp</item>
     </style>
 
-    <style name="SearchHistoryTitleText" parent="SearchStateText" />
+    <style name="SearchHistoryTitleText" parent="EmptyStateText" />
 
     <style name="PlaceholderLinear">
         <item name="android:layout_width">wrap_content</item>
