@@ -11,8 +11,8 @@ class LibraryViewPagerAdapter(
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> FavoriteTracksFragment()
-            1 -> PlaylistsFragment()
+            0 -> FavoriteTracksFragment.newInstance()
+            1 -> PlaylistsFragment.newInstance()
             else -> throw IllegalArgumentException("Invalid position: $position")
         }
     }

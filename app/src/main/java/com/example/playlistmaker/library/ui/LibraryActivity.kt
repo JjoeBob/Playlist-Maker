@@ -36,6 +36,11 @@ class LibraryActivity : AppCompatActivity() {
         tabMediator.attach()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        tabMediator.detach()
+    }
+
     private fun setupToolBar() {
         binding.toolbar.setNavigationOnClickListener {
             finish()
