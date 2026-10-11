@@ -12,13 +12,9 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
+        style="@style/Tab"
         android:layout_width="match_parent"
-        app:tabIndicatorFullWidth="false"
-        android:layout_height="wrap_content"
-        app:tabBackground="?attr/android:colorBackground"
-        app:tabIndicatorColor="?attr/colorOnSurface"
-        app:tabIndicatorHeight="2dp"
-        app:tabSelectedTextColor="?attr/colorOnSurface" />
+        android:layout_height="wrap_content" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
