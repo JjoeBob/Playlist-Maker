@@ -38,6 +38,7 @@
     </style>
 
     <style name="ToolBar">
+        <item name="android:layout_marginStart">16dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">?attr/actionBarSize</item>
         <item name="contentInsetStart">0dp</item>
@@ -47,10 +48,16 @@
         <item name="titleMarginStart">0dp</item>
     </style>
 
-    <!--    <style name="SettingsItemOld" parent="ScreenHeader">-->
-    <!--        <item name="android:background">?attr/selectableItemBackground</item>-->
-    <!--        <item name="android:clickable">true</item>-->
-    <!--    </style>-->
+    <style name="ToolBarWithButton">
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="contentInsetStart">0dp</item>
+        <item name="contentInsetStartWithNavigation">0dp</item>
+        <item name="navigationIconTint">?attr/colorOnSurface</item>
+        <item name="titleTextAppearance">@style/HeaderText</item>
+        <item name="titleMarginStart">0dp</item>
+    </style>
 
     <style name="SettingsItem">
         <item name="android:layout_width">match_parent</item>
@@ -143,6 +150,12 @@
         <item name="tabSelectedTextColor">?attr/colorOnSurface</item>
         <item name="tabTextAppearance">@style/TabTextAppearance</item>
         <item name="tabTextColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="BottomNavigationText" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="fontFamily">@font/ys_display_regular</item>
     </style>
 
 </resources>

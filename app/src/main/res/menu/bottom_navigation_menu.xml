@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/search_graph"
+        android:icon="@drawable/ic_bottom_navigation_search_24"
+        android:title="@string/bottom_navigation_search" />
+    <item
+        android:id="@+id/libraryFragment"
+        android:icon="@drawable/ic_bottom_navigation_library_24"
+        android:title="@string/bottom_navigation_library" />
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/ic_bottom_navigation_settings_24"
+        android:title="@string/bottom_navigation_settings" />
+
+</menu>

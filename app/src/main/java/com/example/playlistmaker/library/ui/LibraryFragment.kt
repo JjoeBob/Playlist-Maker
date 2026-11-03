@@ -28,7 +28,6 @@ class LibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupToolBar()
         binding.viewPager.adapter = LibraryViewPagerAdapter(childFragmentManager, lifecycle)
         tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
@@ -40,11 +39,6 @@ class LibraryFragment : Fragment() {
         tabMediator.attach()
     }
 
-    private fun setupToolBar() {
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

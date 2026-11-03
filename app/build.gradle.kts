@@ -46,7 +46,6 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
     implementation("androidx.fragment:fragment-ktx:1.8.6")
 
-    implementation("com.google.android.material:material:1.8.0")
     implementation("io.insert-koin:koin-android:3.3.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")

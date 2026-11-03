@@ -29,17 +29,10 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupToolBar()
         setupShareButton()
         setupSupportButton()
         setupAgreementButton()
         setupThemeSwitcher()
-    }
-
-    private fun setupToolBar() {
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
     }
 
     private fun setupShareButton() {

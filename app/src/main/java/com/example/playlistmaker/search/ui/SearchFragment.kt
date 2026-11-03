@@ -45,7 +45,6 @@ class SearchFragment : Fragment() {
         setupHistoryAdapter()
         setupTracksRecycler()
         setupHistoryRecycler()
-        setupToolBar()
         setupSearch()
         setupClear()
         setupSearchUpdateButton()
@@ -59,12 +58,6 @@ class SearchFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         updateHistoryVisibility()
-    }
-
-    private fun setupToolBar() {
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
     }
 
     private fun setupSearch() {
@@ -187,6 +180,11 @@ class SearchFragment : Fragment() {
         val isTextEmpty = binding.searchField.text.isEmpty()
 
         viewModel.updateHistoryVisibility(hasFocus, isTextEmpty)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        updateHistoryVisibility()
     }
 
     override fun onDestroyView() {
