@@ -75,10 +75,10 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_search_nothing_found_120" />
+                android:src="@drawable/ic_nothing_found_120" />
 
             <TextView
-                style="@style/SearchStateText"
+                style="@style/EmptyStateText"
                 android:layout_marginTop="16dp"
                 android:text="@string/search_nothing_found" />
         </LinearLayout>
@@ -94,14 +94,14 @@
                 android:src="@drawable/ic_search_no_internet_120" />
 
             <TextView
-                style="@style/SearchStateText"
+                style="@style/EmptyStateText"
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="16dp"
                 android:text="@string/search_no_internet" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/searchUpdateButton"
-                style="@style/SearchScreenActionButton"
+                style="@style/RoundedActionButton"
                 android:layout_marginTop="24dp"
                 android:text="@string/search_update_button" />
 
@@ -150,7 +150,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/clearHistoryButton"
-                        style="@style/SearchScreenActionButton"
+                        style="@style/RoundedActionButton"
                         android:layout_marginVertical="24dp"
                         android:text="@string/clear_search_history"
                         tools:visibility="gone" />
