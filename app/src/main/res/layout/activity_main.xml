@@ -1,40 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root"
+    android:id="@+id/container_view"
+    android:name="androidx.navigation.fragment.NavHostFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/mainScreenBackground"
-    android:orientation="vertical">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        style="@style/ToolBar"
-        app:title="@string/app_name"
-        app:contentInsetStart="@dimen/standard_padding"
-        app:titleTextColor="@color/yp_white"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/searchButton"
-        style="@style/MenuButton"
-        android:layout_marginHorizontal="@dimen/standard_padding"
-        android:layout_marginBottom="@dimen/standard_padding"
-        android:text="@string/button_search"
-        app:icon="@drawable/ic_search_24" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/libraryButton"
-        style="@style/MenuButton"
-        android:layout_marginHorizontal="@dimen/standard_padding"
-        android:layout_marginBottom="@dimen/standard_padding"
-        android:text="@string/button_library"
-        app:icon="@drawable/ic_library_24" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/settingsButton"
-        style="@style/MenuButton"
-        android:layout_marginHorizontal="@dimen/standard_padding"
-        android:layout_marginBottom="28dp"
-        android:text="@string/button_settings"
-        app:icon="@drawable/ic_settings_24" />
-
-</LinearLayout>
+    app:defaultNavHost="true"
+    app:navGraph="@navigation/navigation_graph" />

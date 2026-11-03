@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/menuFragment">
+
+    <fragment
+        android:id="@+id/menuFragment"
+        tools:layout="@layout/fragment_menu"
+        android:name="com.example.playlistmaker.main.ui.MenuFragment"
+        android:label="MenuFragment" >
+        <action
+            android:id="@+id/action_menuFragment_to_libraryFragment"
+            app:destination="@id/libraryFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        tools:layout="@layout/fragment_search"
+        android:name="com.example.playlistmaker.search.ui.SearchFragment"
+        android:label="SearchFragment" >
+        <action
+            android:id="@+id/action_searchFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/playerFragment"
+        tools:layout="@layout/fragment_player"
+        android:name="com.example.playlistmaker.player.ui.PlayerFragment"
+        android:label="PlayerFragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        tools:layout="@layout/fragment_settings"
+        android:name="com.example.playlistmaker.settings.ui.SettingsFragment"
+        android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/libraryFragment"
+        tools:layout="@layout/fragment_library"
+        android:name="com.example.playlistmaker.library.ui.LibraryFragment"
+        android:label="LibraryFragment" />
+</navigation>
