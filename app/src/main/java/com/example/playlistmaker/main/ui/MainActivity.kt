@@ -1,6 +1,7 @@
 package com.example.playlistmaker.main.ui
 
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -39,8 +40,21 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.container_view) as NavHostFragment
         val navController = navHostFragment.findNavController()
-
         binding.bottomNavigation.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.playerFragment -> {
+                    binding.line.visibility = View.GONE
+                    binding.bottomNavigation.visibility = View.GONE
+                }
+
+                else -> {
+                    binding.line.visibility = View.VISIBLE
+                    binding.bottomNavigation.visibility = View.VISIBLE
+                }
+            }
+        }
 
         val font = ResourcesCompat.getFont(this, R.font.ys_display_regular)
 
