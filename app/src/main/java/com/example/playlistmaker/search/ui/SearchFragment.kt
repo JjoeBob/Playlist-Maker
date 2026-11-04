@@ -1,56 +1,56 @@
 package com.example.playlistmaker.search.ui
 
-import android.content.Intent
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
-import com.example.playlistmaker.databinding.ActivitySearchBinding
-import com.example.playlistmaker.player.ui.PlayerActivity
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.FragmentSearchBinding
+import com.example.playlistmaker.player.ui.PlayerFragment
 import com.example.playlistmaker.search.ui.SearchScreenState.Clear
 import com.example.playlistmaker.search.ui.SearchScreenState.Empty
-import com.example.playlistmaker.search.ui.SearchScreenState.Error
 import com.example.playlistmaker.search.ui.SearchScreenState.History
 import com.example.playlistmaker.search.ui.SearchScreenState.InProgress
 import com.example.playlistmaker.search.ui.SearchScreenState.Success
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: SearchViewModel by viewModel()
 
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
 
-    private lateinit var binding: ActivitySearchBinding
-    private val viewModel: SearchViewModel by viewModel()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
-            val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            windowInsets
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         setupSearchAdapter()
         setupHistoryAdapter()
         setupTracksRecycler()
         setupHistoryRecycler()
-        setupToolBar()
         setupSearch()
         setupClear()
         setupSearchUpdateButton()
         setupClearHistoryButton()
 
-        viewModel.observeSearchState().observe(this) {
+        viewModel.observeSearchState().observe(viewLifecycleOwner) {
             render(it)
         }
     }
@@ -58,19 +58,6 @@ class SearchActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateHistoryVisibility()
-    }
-
-    private fun setupToolBar() {
-        binding.toolbar.setNavigationOnClickListener {
-            finish()
-        }
-    }
-
-    private fun updateHistoryVisibility() {
-        val hasFocus = binding.searchField.hasFocus()
-        val isTextEmpty = binding.searchField.text.isEmpty()
-
-        viewModel.updateHistoryVisibility(hasFocus, isTextEmpty)
     }
 
     private fun setupSearch() {
@@ -95,7 +82,8 @@ class SearchActivity : AppCompatActivity() {
     private fun setupClear() {
         binding.clearButton.setOnClickListener {
             binding.searchField.text.clear()
-            val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
+            val inputMethodManager =
+                requireActivity().getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(binding.searchField.windowToken, 0)
         }
     }
@@ -104,9 +92,10 @@ class SearchActivity : AppCompatActivity() {
         searchAdapter = TrackAdapter(emptyList()) { track ->
             if (viewModel.clickDebounce()) {
                 viewModel.onTrackClicked(track)
-                val playerIntent = Intent(this, PlayerActivity::class.java)
-                playerIntent.putExtra(TRACK_KEY, track)
-                startActivity(playerIntent)
+                findNavController().navigate(
+                    R.id.action_searchFragment_to_playerFragment,
+                    PlayerFragment.createArgs(track)
+                )
             }
         }
     }
@@ -114,9 +103,10 @@ class SearchActivity : AppCompatActivity() {
     private fun setupHistoryAdapter() {
         historyAdapter = TrackAdapter(emptyList()) { track ->
             if (viewModel.clickDebounce()) {
-                val playerIntent = Intent(this, PlayerActivity::class.java)
-                playerIntent.putExtra(TRACK_KEY, track)
-                startActivity(playerIntent)
+                findNavController().navigate(
+                    R.id.action_searchFragment_to_playerFragment,
+                    PlayerFragment.createArgs(track)
+                )
             }
         }
     }
@@ -158,7 +148,7 @@ class SearchActivity : AppCompatActivity() {
                     placeholderNothingFound.visibility = View.VISIBLE
                 }
 
-                Error -> {
+                SearchScreenState.Error -> {
                     placeholderNoInternet.visibility = View.VISIBLE
                 }
 
@@ -185,7 +175,20 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
-        private const val TRACK_KEY = "track"
+    private fun updateHistoryVisibility() {
+        val hasFocus = binding.searchField.hasFocus()
+        val isTextEmpty = binding.searchField.text.isEmpty()
+
+        viewModel.updateHistoryVisibility(hasFocus, isTextEmpty)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        updateHistoryVisibility()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -1,50 +1,67 @@
 package com.example.playlistmaker.main.ui
 
-import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.descendants
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
+import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityMainBinding
-import com.example.playlistmaker.library.ui.LibraryActivity
-import com.example.playlistmaker.search.ui.SearchActivity
-import com.example.playlistmaker.settings.ui.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
-            val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            windowInsets
+        enableEdgeToEdge()
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars()
+            )
+
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom
+            )
+
+            WindowInsetsCompat.CONSUMED
         }
 
-        setupSearchButton()
-        setupLibraryButton()
-        setupSettingsButton()
-    }
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.container_view) as NavHostFragment
+        val navController = navHostFragment.findNavController()
+        binding.bottomNavigation.setupWithNavController(navController)
 
-    private fun setupSearchButton() {
-        binding.searchButton.setOnClickListener {
-            startActivity(Intent(this, SearchActivity::class.java))
-        }
-    }
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.playerFragment -> {
+                    binding.line.visibility = View.GONE
+                    binding.bottomNavigation.visibility = View.GONE
+                }
 
-    private fun setupLibraryButton() {
-        binding.libraryButton.setOnClickListener {
-            startActivity(Intent(this, LibraryActivity::class.java))
+                else -> {
+                    binding.line.visibility = View.VISIBLE
+                    binding.bottomNavigation.visibility = View.VISIBLE
+                }
+            }
         }
-    }
 
-    private fun setupSettingsButton() {
-        binding.settingsButton.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
+        val font = ResourcesCompat.getFont(this, R.font.ys_display_regular)
+
+        binding.bottomNavigation.descendants
+            .filterIsInstance<TextView>()
+            .forEach { textView ->
+                textView.typeface = font
+            }
     }
 }

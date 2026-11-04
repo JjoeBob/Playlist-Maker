@@ -1,45 +1,50 @@
 package com.example.playlistmaker.player.ui
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.os.BundleCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.search.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
-class PlayerActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityPlayerBinding
+class PlayerFragment : Fragment() {
+    private var _binding: FragmentPlayerBinding? = null
+    private val binding get() = _binding!!
     private val viewModel by viewModel<PlayerViewModel> {
-        parametersOf(intent.getSerializableExtra("track") as? Track)
+        val track = BundleCompat.getSerializable(requireArguments(), ARGS_TRACK, Track::class.java)
+        parametersOf(track)
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentPlayerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivityPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
-            val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            windowInsets
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        viewModel.observeTrackUI().observe(this) {
+        viewModel.observeTrackUI().observe(viewLifecycleOwner) {
             bindTrackData(it)
         }
 
-        viewModel.observePlayerState().observe(this) {
+        viewModel.observePlayerState().observe(viewLifecycleOwner) {
             render(it)
         }
 
-        viewModel.observePlaybackTime().observe(this) {
+        viewModel.observePlaybackTime().observe(viewLifecycleOwner) {
             binding.playbackTime.text = it
         }
 
@@ -63,7 +68,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun setupToolBar() {
         binding.playerToolbar.setNavigationOnClickListener {
-            finish()
+            findNavController().navigateUp()
         }
     }
 
@@ -86,7 +91,7 @@ class PlayerActivity : AppCompatActivity() {
             genreValue.text = track.genre
             countryValue.text = track.country
 
-            Glide.with(this@PlayerActivity)
+            Glide.with(requireActivity())
                 .load(track.coverArtworkUrl)
                 .placeholder(R.drawable.ic_placeholder_album_312)
                 .into(albumImage)
@@ -114,5 +119,15 @@ class PlayerActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    companion object {
+        const val ARGS_TRACK = "track"
+        fun createArgs(track: Track) = bundleOf(ARGS_TRACK to track)
     }
 }

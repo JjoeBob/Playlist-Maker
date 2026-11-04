@@ -42,7 +42,7 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/playerToolbar"
-            style="@style/ToolBar"
+            style="@style/ToolBarWithButton"
             android:layout_marginBottom="@dimen/settings_margin_large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

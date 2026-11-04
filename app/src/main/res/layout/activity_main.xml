@@ -1,40 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/mainScreenBackground"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        style="@style/ToolBar"
-        app:title="@string/app_name"
-        app:contentInsetStart="@dimen/standard_padding"
-        app:titleTextColor="@color/yp_white"/>
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/container_view"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/navigation_graph" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/searchButton"
-        style="@style/MenuButton"
-        android:layout_marginHorizontal="@dimen/standard_padding"
-        android:layout_marginBottom="@dimen/standard_padding"
-        android:text="@string/button_search"
-        app:icon="@drawable/ic_search_24" />
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/yp_light_gray"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/libraryButton"
-        style="@style/MenuButton"
-        android:layout_marginHorizontal="@dimen/standard_padding"
-        android:layout_marginBottom="@dimen/standard_padding"
-        android:text="@string/button_library"
-        app:icon="@drawable/ic_library_24" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/settingsButton"
-        style="@style/MenuButton"
-        android:layout_marginHorizontal="@dimen/standard_padding"
-        android:layout_marginBottom="28dp"
-        android:text="@string/button_settings"
-        app:icon="@drawable/ic_settings_24" />
-
-</LinearLayout>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="?attr/android:colorBackground"
+        android:elevation="0dp"
+        app:elevation="0dp"
+        app:itemIconTint="@color/bottom_navigation_item_color"
+        app:itemTextAppearanceActive="@style/BottomNavigationText"
+        app:itemTextAppearanceActiveBoldEnabled="false"
+        app:itemTextAppearanceInactive="@style/BottomNavigationText"
+        app:itemTextColor="@color/bottom_navigation_item_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_navigation_menu" />
+</androidx.constraintlayout.widget.ConstraintLayout>
