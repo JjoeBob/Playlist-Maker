@@ -11,6 +11,7 @@ import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class SearchViewModel(
     private val searchHistoryInteractor: SearchHistoryInteractor,
@@ -38,16 +39,21 @@ class SearchViewModel(
 
         searchStateLiveData.value = SearchScreenState.InProgress
 
-        tracksInteractor.searchTracks(searchText) { foundTracks ->
-            handler.post {
-                when {
-                    foundTracks == null -> searchStateLiveData.value = SearchScreenState.Error
-                    foundTracks.isNotEmpty() -> searchStateLiveData.value =
-                        SearchScreenState.Success(foundTracks)
-
-                    else -> searchStateLiveData.value = SearchScreenState.Empty
+        viewModelScope.launch {
+            tracksInteractor.searchTracks(searchText)
+                .collect { foundTracks ->
+                    processResult(foundTracks)
                 }
-            }
+        }
+    }
+
+    private fun processResult(foundTracks: List<Track>?) {
+        when {
+            foundTracks == null -> searchStateLiveData.value = SearchScreenState.Error
+            foundTracks.isNotEmpty() -> searchStateLiveData.value =
+                SearchScreenState.Success(foundTracks)
+
+            else -> searchStateLiveData.value = SearchScreenState.Empty
         }
     }
 
@@ -66,7 +72,7 @@ class SearchViewModel(
         if (isClickAllowed) {
             isClickAllowed = false
             viewModelScope.launch {
-                delay(CLICK_DEBOUNCE_DELAY)
+                delay(CLICK_DEBOUNCE_DELAY.milliseconds)
                 isClickAllowed = true
             }
         }
@@ -77,7 +83,7 @@ class SearchViewModel(
         searchDebounceJob?.cancel()
         if (changedText.isNotEmpty()) {
             searchDebounceJob = viewModelScope.launch {
-                delay(SEARCH_DEBOUNCE_DELAY)
+                delay(SEARCH_DEBOUNCE_DELAY.milliseconds)
                 if (changedText != latestSearchText) {
                     latestSearchText = changedText
                     val text = latestSearchText
