@@ -47,6 +47,10 @@ class AudioPlayerInteractorImpl(val audioPlayer: AudioPlayer) : AudioPlayerInter
         return audioPlayer.getCurrentPosition()
     }
 
+    override fun isPlaying(): Boolean {
+        return audioPlayer.isPlaying()
+    }
+
     override fun setOnStateChangeListener(onStateChangeListener: (AudioPlayerState) -> Unit) {
         this.onStateChangeListener = onStateChangeListener
     }

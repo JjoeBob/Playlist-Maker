@@ -28,6 +28,10 @@ class AudioPlayerImpl(private val audioPlayer: MediaPlayer) : AudioPlayer {
         audioPlayer.setOnCompletionListener { onCompletionListener() }
     }
 
+    override fun isPlaying(): Boolean {
+        return audioPlayer.isPlaying
+    }
+
     override fun getCurrentPosition(): Int {
         return audioPlayer.currentPosition
     }

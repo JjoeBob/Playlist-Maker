@@ -1,12 +1,15 @@
 package com.example.playlistmaker.player.ui
 
-import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.player.domain.api.AudioPlayerInteractor
 import com.example.playlistmaker.player.domain.models.AudioPlayerState
 import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -14,16 +17,9 @@ class PlayerViewModel(
     private val track: Track,
     private val audioPlayerInteractor: AudioPlayerInteractor,
     private val timeFormatter: SimpleDateFormat,
-    private val handler: Handler
 ) : ViewModel() {
     private var isInitialized = false
-
-    private val timerRunnable = object : Runnable {
-        override fun run() {
-            playbackTimeLiveData.postValue(timeFormatter.format(audioPlayerInteractor.getCurrentPosition()))
-            handler.postDelayed(this, UPDATE_TIME_DELAY)
-        }
-    }
+    private var timerJob: Job? = null
 
     private val playbackTimeLiveData = MutableLiveData("0:00")
     fun observePlaybackTime(): LiveData<String> = playbackTimeLiveData
@@ -106,11 +102,16 @@ class PlayerViewModel(
     }
 
     private fun startTimer() {
-        handler.post(timerRunnable)
+        timerJob = viewModelScope.launch {
+            while (audioPlayerInteractor.isPlaying()) {
+                delay(UPDATE_TIME_DELAY)
+                playbackTimeLiveData.postValue(timeFormatter.format(audioPlayerInteractor.getCurrentPosition()))
+            }
+        }
     }
 
     private fun pauseTimer() {
-        handler.removeCallbacks(timerRunnable)
+        timerJob?.cancel()
     }
 
     fun pausePlayer() {
@@ -123,7 +124,7 @@ class PlayerViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        handler.removeCallbacks(timerRunnable)
+        timerJob?.cancel()
         releasePlayer()
     }
 
