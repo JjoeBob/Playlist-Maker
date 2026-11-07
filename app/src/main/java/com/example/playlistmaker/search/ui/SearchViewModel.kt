@@ -4,25 +4,29 @@ import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.search.domain.api.SearchHistoryInteractor
 import com.example.playlistmaker.search.domain.api.TracksInteractor
 import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val searchHistoryInteractor: SearchHistoryInteractor,
     private val tracksInteractor: TracksInteractor,
     private val handler: Handler
 ) : ViewModel() {
-    private var latestSearchText: String? = null
     private var isClickAllowed = true
 
-    private val clickRunnable = Runnable { isClickAllowed = true }
     private val searchRunnable = Runnable {
         val text = latestSearchText
         if (!text.isNullOrEmpty()) {
             search(text)
         }
     }
+    private var latestSearchText: String? = null
+    private var searchDebounceJob: Job? = null
 
     private val searchStateLiveData = MutableLiveData<SearchScreenState>()
     fun observeSearchState(): LiveData<SearchScreenState> = searchStateLiveData
@@ -61,23 +65,35 @@ class SearchViewModel(
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed(clickRunnable, CLICK_DEBOUNCE_DELAY)
+            viewModelScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
         }
         return current
     }
 
     fun searchDebounce(changedText: String) {
-        latestSearchText = changedText
-        handler.removeCallbacks(searchRunnable)
-
+        searchDebounceJob?.cancel()
         if (changedText.isNotEmpty()) {
-            handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+            searchDebounceJob = viewModelScope.launch {
+                delay(SEARCH_DEBOUNCE_DELAY)
+                if (changedText != latestSearchText) {
+                    latestSearchText = changedText
+                    val text = latestSearchText
+                    if (!text.isNullOrEmpty()) {
+                        search(text)
+                    }
+                }
+            }
         } else {
             val history = searchHistoryInteractor.getHistory()
             if (history.isNotEmpty()) {
                 searchStateLiveData.value = SearchScreenState.History(history)
+                latestSearchText = null
             } else {
                 searchStateLiveData.value = SearchScreenState.Clear
+                latestSearchText = null
             }
         }
     }
@@ -95,7 +111,6 @@ class SearchViewModel(
         super.onCleared()
         handler.removeCallbacks(searchRunnable)
         tracksInteractor.cancelSearch()
-        handler.removeCallbacks(clickRunnable)
     }
 
     companion object {
