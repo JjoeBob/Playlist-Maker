@@ -28,6 +28,7 @@ class SearchViewModel(
     }
     private var latestSearchText: String? = null
     private var searchDebounceJob: Job? = null
+    private var searchJob: Job? = null
 
     private val searchStateLiveData = MutableLiveData<SearchScreenState>()
     fun observeSearchState(): LiveData<SearchScreenState> = searchStateLiveData
@@ -35,11 +36,11 @@ class SearchViewModel(
     fun search(searchText: String) {
         if (searchText.isBlank()) return
 
-        handler.removeCallbacks(searchRunnable)
+        searchDebounceJob?.cancel()
 
         searchStateLiveData.value = SearchScreenState.InProgress
 
-        viewModelScope.launch {
+        searchJob = viewModelScope.launch {
             tracksInteractor.searchTracks(searchText)
                 .collect { foundTracks ->
                     processResult(foundTracks)

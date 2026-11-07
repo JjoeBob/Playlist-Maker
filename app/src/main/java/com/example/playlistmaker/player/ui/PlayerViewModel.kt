@@ -12,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
 
 class PlayerViewModel(
     private val track: Track,
@@ -104,7 +105,7 @@ class PlayerViewModel(
     private fun startTimer() {
         timerJob = viewModelScope.launch {
             while (audioPlayerInteractor.isPlaying()) {
-                delay(UPDATE_TIME_DELAY)
+                delay(UPDATE_TIME_DELAY.milliseconds)
                 playbackTimeLiveData.postValue(timeFormatter.format(audioPlayerInteractor.getCurrentPosition()))
             }
         }
@@ -129,6 +130,6 @@ class PlayerViewModel(
     }
 
     companion object {
-        private const val UPDATE_TIME_DELAY = 100L
+        private const val UPDATE_TIME_DELAY = 300L
     }
 }
