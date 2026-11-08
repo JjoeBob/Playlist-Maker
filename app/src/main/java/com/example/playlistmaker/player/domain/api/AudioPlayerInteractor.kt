@@ -10,6 +10,7 @@ interface AudioPlayerInteractor {
     fun preparePlayer(url: String?)
 
     fun getCurrentPosition(): Int
+    fun isPlaying(): Boolean
 
     fun setOnStateChangeListener(onStateChangeListener: (AudioPlayerState) -> Unit)
 }

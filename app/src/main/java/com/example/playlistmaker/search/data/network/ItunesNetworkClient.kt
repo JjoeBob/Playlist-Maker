@@ -3,32 +3,27 @@ package com.example.playlistmaker.search.data.network
 import com.example.playlistmaker.search.data.NetworkClient
 import com.example.playlistmaker.search.data.dto.Response
 import com.example.playlistmaker.search.data.dto.TracksSearchRequest
-import com.example.playlistmaker.search.data.dto.TracksSearchResponse
-import retrofit2.Call
+import kotlinx.coroutines.Job
 
 class ItunesNetworkClient(private val itunesApiService: ItunesApiService) : NetworkClient {
-    private var currentCall: Call<TracksSearchResponse>? = null
+    private var currentJob: Job? = null
 
-    override fun doRequest(dto: Any): Response {
-        return if (dto is TracksSearchRequest) {
-            try {
-                val call = itunesApiService.search(dto.query)
-                currentCall = call
-                val resp = call.execute()
-                val body = resp.body() ?: Response()
-
-                body.apply { resultCode = resp.code() }
-            } catch (_: Exception) {
-                Response().apply { resultCode = -1 }
-            }
-
-        } else {
-            Response().apply { resultCode = 400 }
+    override suspend fun doRequest(dto: Any): Response {
+        if (dto !is TracksSearchRequest) {
+            return Response().apply { resultCode = 400 }
         }
+
+        return try {
+            val response = itunesApiService.search(dto.query)
+            response.apply { resultCode = 200 }
+        } catch (_: Throwable) {
+            Response().apply { resultCode = -1 }
+        }
+
     }
 
     override fun cancelRequest() {
-        currentCall?.cancel()
-        currentCall = null
+        currentJob?.cancel()
+        currentJob = null
     }
 }

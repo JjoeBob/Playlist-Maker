@@ -2,31 +2,43 @@ package com.example.playlistmaker.search.data
 
 import com.example.playlistmaker.search.data.dto.TracksSearchRequest
 import com.example.playlistmaker.search.data.dto.TracksSearchResponse
-import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.domain.api.TracksRepository
+import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRepository {
-    override fun searchTracks(query: String): List<Track>? {
+    override fun searchTracks(query: String): Flow<List<Track>?> = flow {
         val response = networkClient.doRequest(TracksSearchRequest(query))
-        if (response.resultCode == 200) {
-            return (response as TracksSearchResponse).results.map {
-                Track(
-                    trackId = it.trackId,
-                    trackName = it.trackName,
-                    artistName = it.artistName,
-                    trackTime = it.trackTime,
-                    artworkUrl = it.artworkUrl,
-                    collectionName = it.collectionName,
-                    releaseDate = it.releaseDate,
-                    primaryGenreName = it.primaryGenreName,
-                    country = it.country,
-                    previewUrl = it.previewUrl
-                )
+        when (response.resultCode) {
+            200 -> {
+                with(response as TracksSearchResponse) {
+                    val tracks = results.map {
+                        Track(
+                            trackId = it.trackId,
+                            trackName = it.trackName,
+                            artistName = it.artistName,
+                            trackTime = it.trackTime,
+                            artworkUrl = it.artworkUrl,
+                            collectionName = it.collectionName,
+                            releaseDate = it.releaseDate,
+                            primaryGenreName = it.primaryGenreName,
+                            country = it.country,
+                            previewUrl = it.previewUrl
+                        )
+                    }
+                    emit(tracks)
+                }
+
             }
-        } else if (response.resultCode == -1) {
-            return null
-        } else {
-            return emptyList()
+
+            -1 -> {
+                emit(null)
+            }
+
+            else -> {
+                emit(emptyList())
+            }
         }
     }
 

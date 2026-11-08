@@ -10,5 +10,7 @@ interface AudioPlayer {
         onCompletionListener: () -> Unit
     )
 
+    fun isPlaying(): Boolean
+
     fun getCurrentPosition(): Int
 }
