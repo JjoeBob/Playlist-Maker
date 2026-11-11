@@ -136,17 +136,18 @@
             android:layout_height="50dp"
             android:layout_marginStart="64dp"
             android:background="@drawable/bg_player_control_small"
+            android:clickable="true"
+            android:focusable="true"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             app:backgroundTint="@null"
-            app:icon="@drawable/ic_player_like"
+            tools:icon="@drawable/ic_player_like"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="24dp"
-            app:iconTint="@color/yp_white"
-            app:layout_constraintBottom_toBottomOf="@id/playButton"
-            app:layout_constraintEnd_toEndOf="@id/endGuideLine24"
-            app:layout_constraintStart_toEndOf="@id/playButton"
+                app:layout_constraintBottom_toBottomOf="@id/playButton"
+                app:layout_constraintEnd_toEndOf="@id/endGuideLine24"
+                app:layout_constraintStart_toEndOf="@id/playButton"
             app:layout_constraintTop_toTopOf="@id/playButton" />
 
 

@@ -48,15 +48,48 @@ class PlayerFragment : Fragment() {
             binding.playbackTime.text = it
         }
 
+        val track = BundleCompat.getSerializable(
+            requireArguments(),
+            ARGS_TRACK,
+            Track::class.java
+        )
+
         setupPlayButton()
+        setupLikeButton(track)
         setupToolBar()
 
-        viewModel.prepare()
+        viewModel.initialize()
+
+        viewModel.observeTrackState().observe(viewLifecycleOwner) { trackState ->
+            renderLikeButton(trackState)
+        }
     }
 
     override fun onPause() {
         super.onPause()
         viewModel.pausePlayer()
+    }
+
+    private fun renderLikeButton(trackState: TrackState) {
+        binding.apply {
+            when (trackState) {
+                TrackState.Default -> {
+                    likeButton.setIconResource(R.drawable.ic_player_like)
+                    likeButton.setIconTintResource(R.color.yp_white)
+                }
+
+                TrackState.Favorite -> {
+                    likeButton.setIconResource(R.drawable.ic_player_liked)
+                    likeButton.setIconTintResource(R.color.yp_red)
+                }
+            }
+        }
+    }
+
+    private fun setupLikeButton(track: Track) {
+        binding.likeButton.setOnClickListener {
+            viewModel.onLikeButtonClicked(track)
+        }
     }
 
     private fun setupPlayButton() {
