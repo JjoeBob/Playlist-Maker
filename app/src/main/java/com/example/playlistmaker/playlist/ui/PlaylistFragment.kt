@@ -29,7 +29,7 @@ class PlaylistFragment : Fragment() {
         binding.tilName.setTypeface(hintTypeface)
         binding.tilDescription.setTypeface(hintTypeface)
 
-        binding.createButton.setOnClickListener {
+        binding.addPhotoFrame.setOnClickListener {
             binding.createButton.isEnabled = false
         }
     }

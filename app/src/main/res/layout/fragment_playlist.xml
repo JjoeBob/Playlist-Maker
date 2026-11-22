@@ -28,6 +28,28 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="16dp" />
 
+    <FrameLayout
+        android:id="@+id/addPhotoFrame"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_playlist_add_photo_dashed"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintDimensionRatio="h,1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/playlistToolbar">
+
+        <ImageView
+            android:id="@+id/addPhotoImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_playlist_add_photo_100" />
+    </FrameLayout>
+
     <ImageView
         android:id="@+id/playlistImage"
         android:layout_width="0dp"
@@ -36,6 +58,7 @@
         android:layout_marginTop="24dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_placeholder_album_312"
+        android:visibility="invisible"
         app:layout_constraintDimensionRatio="h,1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -75,10 +98,10 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/createButton"
         style="@style/PlaylistRoundedActionButton8"
-        android:text="@string/playlist_create_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
+        android:text="@string/playlist_create_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/endGuideLine16"
         app:layout_constraintStart_toStartOf="@id/startGuideLine16" />
