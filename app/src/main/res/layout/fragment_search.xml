@@ -100,7 +100,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/searchUpdateButton"
-                style="@style/RoundedActionButton"
+                style="@style/RoundedActionButton54"
                 android:layout_marginTop="24dp"
                 android:text="@string/search_update_button" />
 
@@ -149,7 +149,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/clearHistoryButton"
-                        style="@style/RoundedActionButton"
+                        style="@style/RoundedActionButton54"
                         android:layout_marginVertical="24dp"
                         android:text="@string/clear_search_history"
                         tools:visibility="gone" />

@@ -73,11 +73,12 @@
 
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/createButton"
+        style="@style/PlaylistRoundedActionButton8"
+        android:text="@string/playlist_create_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/endGuideLine16"
         app:layout_constraintStart_toStartOf="@id/startGuideLine16" />

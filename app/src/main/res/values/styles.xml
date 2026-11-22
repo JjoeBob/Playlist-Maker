@@ -78,7 +78,7 @@
         <item name="android:tint">?attr/colorOnSurfaceVariant</item>
     </style>
 
-    <style name="RoundedActionButton">
+    <style name="RoundedActionButton54">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:backgroundTint">?attr/colorOnSurface</item>
@@ -89,10 +89,31 @@
         <item name="android:minHeight">0dp</item>
         <item name="android:paddingHorizontal">14dp</item>
         <item name="android:paddingVertical">10dp</item>
+        <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">?attr/android:colorBackground</item>
         <item name="android:textSize">14sp</item>
         <item name="cornerRadius">54dp</item>
+    </style>
+
+    <style name="PlaylistRoundedActionButton8">
+        <item name="android:letterSpacing">0</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:backgroundTint">@color/playlist_button_color</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:paddingVertical">12dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/yp_white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">8dp</item>
     </style>
 
     <style name="EmptyStateText">

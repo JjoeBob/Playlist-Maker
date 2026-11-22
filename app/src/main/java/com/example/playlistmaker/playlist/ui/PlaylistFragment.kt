@@ -28,6 +28,10 @@ class PlaylistFragment : Fragment() {
         val hintTypeface = requireContext().resources.getFont(R.font.ys_display_regular)
         binding.tilName.setTypeface(hintTypeface)
         binding.tilDescription.setTypeface(hintTypeface)
+
+        binding.createButton.setOnClickListener {
+            binding.createButton.isEnabled = false
+        }
     }
 
     override fun onDestroyView() {
