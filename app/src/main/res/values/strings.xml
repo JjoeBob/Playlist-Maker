@@ -38,4 +38,5 @@
     <string name="bottom_navigation_search">Поиск</string>
     <string name="bottom_navigation_library">Медиатека</string>
     <string name="bottom_navigation_settings">Настройки</string>
+    <string name="playlist_title">Новый плейлист</string>
 </resources>

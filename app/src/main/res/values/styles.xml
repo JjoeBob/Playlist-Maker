@@ -49,7 +49,6 @@
     </style>
 
     <style name="ToolBarWithButton">
-        <item name="android:layout_marginStart">12dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">?attr/actionBarSize</item>
         <item name="contentInsetStart">0dp</item>
