@@ -26,15 +26,18 @@ class PlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val hintTypeface = requireContext().resources.getFont(R.font.ys_display_regular)
-        binding.tilName.setTypeface(hintTypeface)
-        binding.tilDescription.setTypeface(hintTypeface)
-
         binding.addPhotoFrame.setOnClickListener {
             binding.createButton.isEnabled = false
         }
 
+        setupHintFonts()
         setupToolBar()
+    }
+
+    private fun setupHintFonts() {
+        val hintTypeface = requireContext().resources.getFont(R.font.ys_display_regular)
+        binding.tilName.setTypeface(hintTypeface)
+        binding.tilDescription.setTypeface(hintTypeface)
     }
 
     private fun setupToolBar() {
