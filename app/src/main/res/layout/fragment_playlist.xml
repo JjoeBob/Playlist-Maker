@@ -13,4 +13,73 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back_24"
         app:title="@string/playlist_title" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/startGuideLine16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="16dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/endGuideLine16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="16dp" />
+
+    <ImageView
+        android:id="@+id/playlistImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="24dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_placeholder_album_312"
+        app:layout_constraintDimensionRatio="h,1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/playlistToolbar" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilName"
+        style="@style/PlaylistTextInputLayout"
+        android:layout_marginTop="24dp"
+        android:hint="@string/playlist_name_edit"
+        app:layout_constraintEnd_toEndOf="@id/endGuideLine16"
+        app:layout_constraintStart_toStartOf="@id/startGuideLine16"
+        app:layout_constraintTop_toBottomOf="@id/playlistImage">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/nameEditText"
+            style="@style/PlaylistTextInputEditText" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilDescription"
+        style="@style/PlaylistTextInputLayout"
+        android:layout_marginTop="10dp"
+        android:hint="@string/playlist_description_edit"
+        app:layout_constraintEnd_toEndOf="@id/endGuideLine16"
+        app:layout_constraintStart_toStartOf="@id/startGuideLine16"
+        app:layout_constraintTop_toBottomOf="@id/tilName">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/descriptionEditText"
+            style="@style/PlaylistTextInputEditText" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/endGuideLine16"
+        app:layout_constraintStart_toStartOf="@id/startGuideLine16" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
