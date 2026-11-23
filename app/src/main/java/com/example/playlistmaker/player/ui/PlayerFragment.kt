@@ -10,9 +10,12 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.utils.dpToPx
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -127,6 +130,10 @@ class PlayerFragment : Fragment() {
             Glide.with(requireActivity())
                 .load(track.coverArtworkUrl)
                 .placeholder(R.drawable.ic_placeholder_album_312)
+                .transform(
+                    CenterCrop(),
+                    RoundedCorners(8f.dpToPx(requireContext()))
+                )
                 .into(albumImage)
         }
     }
