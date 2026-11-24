@@ -51,11 +51,13 @@ class PlayerFragment : Fragment() {
             binding.playbackTime.text = it
         }
 
-        val track = BundleCompat.getSerializable(
-            requireArguments(),
-            ARGS_TRACK,
-            Track::class.java
-        )
+        val track = requireNotNull(
+            BundleCompat.getSerializable(
+                requireArguments(),
+                ARGS_TRACK,
+                Track::class.java
+            )
+        ) { "Track argument is required" }
 
         setupPlayButton()
         setupLikeButton(track)
