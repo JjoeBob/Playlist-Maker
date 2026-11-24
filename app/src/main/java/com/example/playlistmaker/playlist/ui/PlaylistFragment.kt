@@ -46,6 +46,24 @@ class PlaylistFragment : Fragment() {
         setupToolBar()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        restoreImage()
+    }
+
+    private fun restoreImage() {
+        val imageUri = viewModel.getImageUri()
+
+        if (imageUri != null) {
+            showPlaylistImage(imageUri)
+        }
+    }
+
     private fun handleBackNavigation() {
         if (viewModel.hasUnsavedChanges()) {
             showExitDialog()
