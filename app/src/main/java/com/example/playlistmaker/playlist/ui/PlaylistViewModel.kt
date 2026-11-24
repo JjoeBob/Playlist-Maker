@@ -18,4 +18,10 @@ class PlaylistViewModel : ViewModel() {
     fun updateImage(imageUri: Uri) {
         playlist.imageUri = imageUri
     }
+
+    fun hasUnsavedChanges(): Boolean {
+        return !playlist.name.isNullOrBlank() ||
+                !playlist.description.isNullOrBlank() ||
+                playlist.imageUri != null
+    }
 }

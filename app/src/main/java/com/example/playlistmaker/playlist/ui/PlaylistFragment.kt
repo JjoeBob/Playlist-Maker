@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doOnTextChanged
@@ -16,6 +17,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistBinding
 import com.example.playlistmaker.utils.dpToPx
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistFragment : Fragment() {
@@ -36,11 +38,42 @@ class PlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupBackButton()
         setupAddPhoto()
         setupNameField()
         setupDescriptionField()
         setupHintFonts()
         setupToolBar()
+    }
+
+    private fun handleBackNavigation() {
+        if (viewModel.hasUnsavedChanges()) {
+            showExitDialog()
+        } else {
+            findNavController().navigateUp()
+        }
+    }
+
+    private fun showExitDialog() {
+        val exitDialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.exit_dialog_title))
+            .setMessage(getString(R.string.exit_dialog_message))
+            .setPositiveButton(getString(R.string.exit_dialog_positive)) { _, _ ->
+                findNavController().navigateUp()
+            }
+            .setNeutralButton(getString(R.string.exit_dialog_neutral)) { _, _ ->
+            }
+        exitDialog.show()
+    }
+
+    private fun setupBackButton() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    handleBackNavigation()
+                }
+            })
     }
 
     private fun setupAddPhoto() {
@@ -93,7 +126,7 @@ class PlaylistFragment : Fragment() {
 
     private fun setupToolBar() {
         binding.playlistToolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
+            handleBackNavigation()
         }
     }
 
