@@ -4,6 +4,8 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
+import androidx.room.Room
+import com.example.playlistmaker.library.data.db.AppDatabase
 import com.example.playlistmaker.search.data.NetworkClient
 import com.example.playlistmaker.search.data.SearchHistoryRepositoryImpl
 import com.example.playlistmaker.search.data.network.ItunesApiService
@@ -59,5 +61,10 @@ val dataModule = module {
 
     single<NetworkClient> {
         ItunesNetworkClient(get())
+    }
+
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .build()
     }
 }

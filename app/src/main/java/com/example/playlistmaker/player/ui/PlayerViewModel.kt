@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.library.domain.api.FavoriteTracksInteractor
 import com.example.playlistmaker.player.domain.api.AudioPlayerInteractor
 import com.example.playlistmaker.player.domain.models.AudioPlayerState
 import com.example.playlistmaker.search.domain.models.Track
@@ -17,7 +18,8 @@ import kotlin.time.Duration.Companion.milliseconds
 class PlayerViewModel(
     private val track: Track,
     private val audioPlayerInteractor: AudioPlayerInteractor,
-    private val timeFormatter: SimpleDateFormat,
+    private val favoriteTracksInteractor: FavoriteTracksInteractor,
+    private val timeFormatter: SimpleDateFormat
 ) : ViewModel() {
     private var isInitialized = false
     private var timerJob: Job? = null
@@ -28,12 +30,16 @@ class PlayerViewModel(
     private val playerStateLiveData = MutableLiveData<PlayerScreenState>(PlayerScreenState.Default)
     fun observePlayerState(): LiveData<PlayerScreenState> = playerStateLiveData
 
+    private val trackStateLiveData = MutableLiveData<TrackState>()
+    fun observeTrackState(): LiveData<TrackState> = trackStateLiveData
+
     private val trackUILiveData = MutableLiveData<TrackPlayerUI>()
     fun observeTrackUI(): LiveData<TrackPlayerUI> = trackUILiveData
 
-    fun prepare() {
+    fun initialize() {
         if (isInitialized) return
 
+        checkTrack(track.trackId)
         audioPlayerInteractor.setOnStateChangeListener { playerState ->
             val uiState = when (playerState) {
                 AudioPlayerState.PREPARED -> {
@@ -72,6 +78,18 @@ class PlayerViewModel(
         isInitialized = true
     }
 
+    private fun checkTrack(trackId: Long) {
+        viewModelScope.launch {
+            favoriteTracksInteractor.checkId(trackId)
+                .collect { isFavorite ->
+                    when (isFavorite) {
+                        true -> trackStateLiveData.value = TrackState.Favorite
+                        false -> trackStateLiveData.value = TrackState.Default
+                    }
+                }
+        }
+    }
+
     private fun mapToUI(track: Track): TrackPlayerUI {
         return TrackPlayerUI(
             trackName = track.trackName,
@@ -95,6 +113,24 @@ class PlayerViewModel(
             PlayerScreenState.Playing -> pausePlayer()
             PlayerScreenState.Prepared, PlayerScreenState.Paused, PlayerScreenState.Completed -> startPlayer()
             else -> {}
+        }
+    }
+
+    fun onLikeButtonClicked(track: Track) {
+        viewModelScope.launch {
+            when (trackStateLiveData.value) {
+                TrackState.Default -> {
+                    favoriteTracksInteractor.likeTrack(track)
+                    trackStateLiveData.postValue(TrackState.Favorite)
+                }
+
+                TrackState.Favorite -> {
+                    favoriteTracksInteractor.removeFromFavorites(track)
+                    trackStateLiveData.postValue(TrackState.Default)
+                }
+
+                null -> {}
+            }
         }
     }
 

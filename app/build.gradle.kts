@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -41,6 +42,11 @@ android {
 }
 
 dependencies {
+    val roomVersion = "2.8.4"
+    implementation("androidx.room:room-runtime:${roomVersion}")
+    ksp("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-ktx:${roomVersion}")
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 
     val navVersion = "2.8.9"
