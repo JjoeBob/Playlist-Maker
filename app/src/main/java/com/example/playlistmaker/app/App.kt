@@ -12,10 +12,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
 class App : Application() {
-    companion object {
-        const val SETTINGS_PREFS = "setting_preferences"
-    }
-
     private lateinit var settingsInteractor: SettingsInteractor
 
     var isDarkTheme = false

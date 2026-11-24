@@ -87,8 +87,8 @@ class PlaylistFragment : Fragment() {
 
     private fun setupHintFonts() {
         val hintTypeface = requireContext().resources.getFont(R.font.ys_display_regular)
-        binding.tilName.setTypeface(hintTypeface)
-        binding.tilDescription.setTypeface(hintTypeface)
+        binding.tilName.typeface = hintTypeface
+        binding.tilDescription.typeface = hintTypeface
     }
 
     private fun setupToolBar() {

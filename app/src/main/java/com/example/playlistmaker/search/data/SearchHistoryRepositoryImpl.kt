@@ -29,7 +29,7 @@ class SearchHistoryRepositoryImpl(
     }
 
     override fun getHistory(): List<Track> {
-        val json = sharedPrefs.getString(KEY_HISTORY, null) ?: return emptyList<Track>()
+        val json = sharedPrefs.getString(KEY_HISTORY, null) ?: return emptyList()
         return gson.fromJson(json, Array<Track>::class.java).toList()
     }
 
