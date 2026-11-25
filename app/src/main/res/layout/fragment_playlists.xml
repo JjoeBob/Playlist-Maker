@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -15,21 +16,40 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/emptyPlaceholderImage"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="46dp"
-        android:src="@drawable/ic_nothing_found_120"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/newPlaylistButton" />
+        app:layout_constraintTop_toBottomOf="@id/newPlaylistButton"
+        tools:visibility="gone">
 
-    <TextView
-        style="@style/EmptyStateText"
-        android:layout_marginTop="16dp"
-        android:text="@string/playlists_empty"
+        <ImageView
+            android:id="@+id/emptyPlaceholderImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_nothing_found_120" />
+
+        <TextView
+            style="@style/EmptyStateText"
+            android:layout_marginTop="16dp"
+            android:text="@string/playlists_empty" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginHorizontal="12dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        tools:listitem="@layout/item_playlist"
+        tools:itemCount="5"
+        app:spanCount="2"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emptyPlaceholderImage" />
+        app:layout_constraintTop_toBottomOf="@id/newPlaylistButton" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
