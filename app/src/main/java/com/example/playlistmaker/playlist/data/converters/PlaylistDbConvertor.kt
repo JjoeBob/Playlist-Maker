@@ -8,12 +8,14 @@ class PlaylistDbConvertor {
     fun map(playlist: Playlist): PlaylistEntity = PlaylistEntity(
         name = playlist.name,
         description = playlist.description,
-        imageUri = playlist.imageUri?.toString()
+        imageUri = playlist.imageUri?.toString(),
+        trackCount = playlist.trackCount
     )
 
     fun map(playlistEntity: PlaylistEntity): Playlist = Playlist(
         name = playlistEntity.name,
         description = playlistEntity.description,
-        imageUri = playlistEntity.imageUri?.toUri()
+        imageUri = playlistEntity.imageUri?.toUri(),
+        trackCount = playlistEntity.trackCount
     )
 }

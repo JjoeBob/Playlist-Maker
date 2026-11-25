@@ -5,5 +5,6 @@ import android.net.Uri
 data class Playlist(
     var imageUri: Uri?,
     var name: String,
-    var description: String?
+    var description: String?,
+    var trackCount: Int = 0
 )

@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
+import com.example.playlistmaker.playlist.domain.Playlist
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : Fragment() {
@@ -15,6 +16,8 @@ class PlaylistsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: PlaylistsViewModel by viewModel()
+
+    private lateinit var playlistsAdapter: PlaylistsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,6 +33,40 @@ class PlaylistsFragment : Fragment() {
         binding.newPlaylistButton.setOnClickListener {
             findNavController().navigate(R.id.action_libraryFragment_to_playlistFragment)
         }
+
+        setupAdapter()
+        setupPlaylistsRecycler()
+
+        viewModel.fillData()
+        viewModel.observeState().observe(viewLifecycleOwner) { state ->
+            render(state)
+        }
+    }
+
+    private fun setupAdapter() {
+        playlistsAdapter = PlaylistsAdapter(emptyList()) { }
+    }
+
+    private fun setupPlaylistsRecycler() {
+        binding.playlists.adapter = playlistsAdapter
+    }
+
+    private fun render(state: PlaylistsState) {
+        when (state) {
+            is PlaylistsState.Content -> showContent(state.playlists)
+            PlaylistsState.Empty -> showEmpty()
+        }
+    }
+
+    private fun showEmpty() {
+        binding.playlists.visibility = View.GONE
+        binding.emptyPlaceholderLinear.visibility = View.VISIBLE
+    }
+
+    private fun showContent(playlists: List<Playlist>) {
+        binding.emptyPlaceholderLinear.visibility = View.GONE
+        binding.playlists.visibility = View.VISIBLE
+        playlistsAdapter.updatePlaylists(playlists)
     }
 
     override fun onDestroyView() {
