@@ -4,11 +4,17 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.playlistmaker.playlist.domain.Playlist
+import com.example.playlistmaker.playlist.domain.api.PlaylistInteractor
 
 class PlaylistViewModel(
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
-    private val playlist = Playlist(null, null, null)
+    private val playlist = Playlist(
+        savedStateHandle.get<Uri>(IMAGE_URI),
+        "",
+        null
+    )
 
     fun updateName(name: String) {
         playlist.name = name
@@ -20,14 +26,19 @@ class PlaylistViewModel(
 
     fun updateImage(imageUri: Uri) {
         savedStateHandle[IMAGE_URI] = imageUri
+        playlist.imageUri = imageUri
     }
 
-    fun getImageUri(): Uri? = savedStateHandle[IMAGE_URI]
+    fun getImageUri(): Uri? = savedStateHandle.get<Uri>(IMAGE_URI)
 
     fun hasUnsavedChanges(): Boolean {
-        return !playlist.name.isNullOrBlank() ||
+        return playlist.name.isNotBlank() ||
                 !playlist.description.isNullOrBlank() ||
                 getImageUri() != null
+    }
+
+    suspend fun savePlaylist() {
+        playlistInteractor.savePlaylist(playlist)
     }
 
     companion object {

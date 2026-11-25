@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -18,6 +20,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistBinding
 import com.example.playlistmaker.utils.dpToPx
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistFragment : Fragment() {
@@ -38,17 +41,13 @@ class PlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupCreateButton()
         setupBackButton()
         setupAddPhoto()
         setupNameField()
         setupDescriptionField()
         setupHintFonts()
         setupToolBar()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -92,6 +91,21 @@ class PlaylistFragment : Fragment() {
                     handleBackNavigation()
                 }
             })
+    }
+
+    private fun setupCreateButton() {
+        binding.createButton.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.savePlaylist()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.create_playlist_toast, binding.nameEditText.text),
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                findNavController().popBackStack()
+            }
+        }
     }
 
     private fun setupAddPhoto() {
