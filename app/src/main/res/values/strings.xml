@@ -53,6 +53,9 @@
     <string name="exit_dialog_positive">Завершить</string>
     <string name="exit_dialog_neutral">Отмена</string>
     <string name="create_playlist_toast">Плейлист %1$s создан</string>
+    <string name="bottom_sheet_add_to_playlist_title">Добавить в плейлист</string>
+    <string name="bottom_sheet_new_playlist_button">Новый плейлист</string>
+    <string name="playlist_save_error">Не удалось сохранить плейлист</string>
 
 
 </resources>

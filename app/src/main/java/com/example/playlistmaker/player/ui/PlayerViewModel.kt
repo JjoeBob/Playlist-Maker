@@ -5,8 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.library.domain.api.FavoriteTracksInteractor
+import com.example.playlistmaker.library.ui.PlaylistsState
 import com.example.playlistmaker.player.domain.api.AudioPlayerInteractor
 import com.example.playlistmaker.player.domain.models.AudioPlayerState
+import com.example.playlistmaker.playlist.domain.Playlist
+import com.example.playlistmaker.playlist.domain.api.PlaylistInteractor
 import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -19,6 +22,7 @@ class PlayerViewModel(
     private val track: Track,
     private val audioPlayerInteractor: AudioPlayerInteractor,
     private val favoriteTracksInteractor: FavoriteTracksInteractor,
+    private val playlistInteractor: PlaylistInteractor,
     private val timeFormatter: SimpleDateFormat
 ) : ViewModel() {
     private var isInitialized = false
@@ -35,6 +39,9 @@ class PlayerViewModel(
 
     private val trackUILiveData = MutableLiveData<TrackPlayerUI>()
     fun observeTrackUI(): LiveData<TrackPlayerUI> = trackUILiveData
+
+    private val playlistsStateLiveData = MutableLiveData<PlaylistsState>()
+    fun observePlaylistsState(): LiveData<PlaylistsState> = playlistsStateLiveData
 
     fun initialize() {
         if (isInitialized) return
@@ -76,6 +83,28 @@ class PlayerViewModel(
         trackUILiveData.postValue(mapToUI(track))
 
         isInitialized = true
+    }
+
+    fun loadPlaylists() {
+        viewModelScope.launch {
+            playlistInteractor
+                .getPlaylists()
+                .collect { playlists ->
+                    processResult(playlists)
+                }
+        }
+    }
+
+    private fun processResult(playlists: List<Playlist>) {
+        if (playlists.isEmpty()) {
+            renderState(PlaylistsState.Empty)
+        } else {
+            renderState(PlaylistsState.Content(playlists))
+        }
+    }
+
+    private fun renderState(state: PlaylistsState) {
+        playlistsStateLiveData.postValue(state)
     }
 
     private fun checkTrack(trackId: Long) {

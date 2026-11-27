@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.playlistmaker.playlist.domain.Playlist
 import com.example.playlistmaker.playlist.domain.api.PlaylistInteractor
+import java.io.IOException
 
 class PlaylistViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -37,8 +38,15 @@ class PlaylistViewModel(
                 getImageUri() != null
     }
 
-    suspend fun savePlaylist() {
-        playlistInteractor.savePlaylist(playlist)
+    suspend fun savePlaylist(): Boolean {
+        return try {
+            playlistInteractor.savePlaylist(playlist)
+            true
+        } catch (_: IOException) {
+            false
+        } catch (_: SecurityException) {
+            false
+        }
     }
 
     companion object {

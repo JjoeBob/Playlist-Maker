@@ -96,18 +96,27 @@ class PlaylistFragment : Fragment() {
     private fun setupCreateButton() {
         binding.createButton.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.savePlaylist()
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.create_playlist_toast, binding.nameEditText.text),
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (viewModel.savePlaylist()) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(
+                            R.string.create_playlist_toast,
+                            binding.nameEditText.text
+                        ),
+                        Toast.LENGTH_SHORT
+                    ).show()
 
-                findNavController().popBackStack()
+                    findNavController().popBackStack()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.playlist_save_error,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
-
     private fun setupAddPhoto() {
         val pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->

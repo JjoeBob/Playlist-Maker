@@ -5,6 +5,7 @@
         <item name="android:colorBackground">@color/yp_white</item>
         <item name="colorOnSurface">@color/yp_black</item>
         <item name="colorOnSurfaceVariant">@color/yp_text_gray</item>
+        <item name="bottomSheetHandleColor">@color/yp_light_gray</item>
         <item name="searchFieldBackgroundColor">@color/yp_light_gray</item>
         <item name="searchFieldOnColor">@color/yp_text_gray</item>
         <item name="playerSmallButton">@color/yp_black_25</item>
